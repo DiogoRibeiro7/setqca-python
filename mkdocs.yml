@@ -46,7 +46,9 @@ nav:
       - Minimisation: guide/minimisation.md
   - Methodology: METHODOLOGY.md
   - Architecture: ARCHITECTURE.md
-  - Validation: VALIDATION.md
+  - Validation:
+      - Policy and parity: VALIDATION.md
+      - Mathematical audit: mathematical_validation.md
   - API reference: reference.md
   - Roadmap: ROADMAP.md
   - Contributing: contributing.md
