@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format typecheck test cov check docs docs-build build clean
+.PHONY: help install lint format typecheck test cov parity fixtures check docs docs-build build clean
 
 POETRY ?= poetry
 RUN := $(POETRY) run
@@ -27,6 +27,12 @@ test: ## Run the test suite
 
 cov: ## Run the test suite with a coverage report
 	$(RUN) pytest --cov=setqca --cov-report=term-missing --cov-report=html
+
+parity: ## Run only the R QCA parity tests (no R needed; fixtures are committed)
+	$(RUN) pytest -m parity
+
+fixtures: ## Regenerate the R QCA golden fixtures (requires R and the QCA package)
+	Rscript validation/r/generate_fixtures.R validation/fixtures/r_qca.json
 
 check: ## Run the full quality gate, as CI does
 	$(RUN) ruff check .

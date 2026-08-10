@@ -171,14 +171,26 @@ solutions = minimize(
 ## Scientific validation policy
 
 The R `QCA` package is used as a **reference implementation for parity tests**,
-not as a runtime dependency. The repository includes `validation/r/parity.R` so
-canonical datasets can be run through both implementations.
+not as a runtime dependency. Golden values are generated from CRAN `QCA` and
+committed to `validation/fixtures/r_qca.json`, so parity tests run in CI and on
+any machine without R installed.
+
+Verified against **R `QCA` 3.25** on the canonical Lipset datasets:
+
+| Component | Status |
+| --- | --- |
+| Direct calibration | ✅ to double precision, one documented divergence |
+| Truth-table coding, case counts, consistency, PRI | ✅ |
+| Sufficiency and necessity fit, incl. PRI and RoN | ✅ |
+| Conservative solutions | ✅ |
+| Parsimonious solutions | ✅ |
+| Standard intermediate solutions | ❌ not implemented to standard |
 
 Correctness rests on five layers: unit tests against known results, brute-force
 exactness tests of the minimiser, property-based invariant tests, error-contract
-tests, and R parity fixtures. See
+tests, and these R parity fixtures. See
 [the validation page](https://diogoribeiro7.github.io/setqca-python/VALIDATION/)
-for the current parity status of each component, and
+for the single known divergence and what is still unverified, and
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) for the formal implementation
 contract.
 

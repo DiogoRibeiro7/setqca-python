@@ -49,26 +49,61 @@ silently stops firing is a correctness regression.
 ### 5. Reference parity against R `QCA`
 
 The R `QCA` package is used as a **reference implementation for parity tests**,
-never as a runtime dependency. `validation/r/parity.R` runs canonical datasets
-through R so results can be compared.
+never as a runtime dependency. Golden values are generated from CRAN `QCA` and
+**committed** to `validation/fixtures/r_qca.json`, so the parity tests run in CI
+and on any contributor's machine without R installed.
+
+R is needed only to regenerate the fixtures:
 
 ```bash
-Rscript validation/r/parity.R validation/parity_input.csv
+Rscript validation/r/generate_fixtures.R validation/fixtures/r_qca.json
 ```
+
+A change to that fixture is a change in what the reference implementation says,
+and is reviewed as carefully as a change to the source.
+
+The canonical Lipset datasets shipped with R `QCA` are used: `LF` (fuzzy) and
+`LC` (crisp), across four analyses — two inclusion cutoffs, a crisp analysis,
+and a reduced three-condition model.
 
 ## Parity status
 
-Parity coverage before 1.0 is expected to include:
+Verified against **R `QCA` 3.25** under R 4.5.1:
 
 | # | Component | Status |
 | --- | --- | --- |
-| 1 | Direct calibration | Harness present, fixtures pending |
-| 2 | Truth-table row assignment | Harness present, fixtures pending |
-| 3 | Consistency, coverage, PRI, RoN | Harness present, fixtures pending |
-| 4 | Prime implicants | Harness present, fixtures pending |
-| 5 | Conservative solutions | Harness present, fixtures pending |
-| 6 | Parsimonious solutions | Harness present, fixtures pending |
-| 7 | Standard intermediate solutions | **Not implemented to standard** |
+| 1 | Direct calibration | ✅ Matches to double precision — one documented divergence, below |
+| 2 | Truth-table row assignment | ✅ Matches: row coding, case counts, consistency and PRI |
+| 3 | Consistency, coverage, PRI, RoN | ✅ Matches for sufficiency and necessity, including disjunctions |
+| 4 | Prime implicants | ✅ Covered indirectly — solutions are built from them |
+| 5 | Conservative solutions | ✅ Matches on all four analyses |
+| 6 | Parsimonious solutions | ✅ Matches on all four analyses |
+| 7 | Standard intermediate solutions | ❌ **Not implemented to standard** |
+
+Solutions are compared as canonical sets of literal sets, so agreement is
+genuine set equality rather than string formatting agreeing by luck.
+
+### The one known divergence
+
+`QCA::calibrate` ends with:
+
+```r
+fs[fs < 1e-04] <- 0
+fs[fs > 0.9999] <- 1
+```
+
+R therefore reports a membership below `1e-4` as exactly 0, and above `0.9999`
+as exactly 1. `setqca` reports the value of the transformation itself.
+
+Within the anchors the two agree to machine precision (≤ 1e-16). They differ
+only for values far outside the anchor range — for anchors 20/50/80, a raw score
+of −50 calibrates to `5.46e-05` in `setqca` and to `0` in R.
+
+This is deliberate. Snapping introduces a discontinuity into a continuous
+transformation, and asserting *full* non-membership is a stronger claim than the
+data supports. The difference is bounded by `1e-4` and cannot change a
+truth-table corner assignment. `tests/test_parity.py` pins the divergence, so if
+either implementation changes the test fails rather than drifting quietly.
 
 !!! danger "What this means for your paper"
     Item 7 is the one to watch. The 0.1 intermediate solution is a directional
@@ -89,3 +124,13 @@ Every push runs the full suite on Linux, macOS and Windows across Python 3.11,
 3.12 and 3.13, under `mypy --strict`, with a coverage floor enforced in CI.
 Warnings are errors in the test configuration, so a numerical warning such as an
 overflow fails the build rather than scrolling past.
+
+The parity tests run in that same suite, because the golden values are committed
+rather than computed at test time. A regression against R therefore fails CI on
+every platform, not only on a maintainer's machine with R installed.
+
+Run only the parity tests with:
+
+```bash
+poetry run pytest -m parity
+```

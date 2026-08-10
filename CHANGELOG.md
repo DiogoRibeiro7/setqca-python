@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Parity test suite against the reference R `QCA` implementation
+  (`tests/test_parity.py`), verified against R `QCA` 3.25 on the canonical
+  Lipset `LF` and `LC` datasets across four analyses. Direct calibration,
+  truth-table coding, case counts, consistency, PRI, sufficiency and necessity
+  fit including RoN, and both conservative and parsimonious solutions all match.
+  Solutions are compared as canonical sets of literal sets rather than as
+  formatted strings.
+- `validation/r/generate_fixtures.R`, which emits golden values to
+  `validation/fixtures/r_qca.json`. The fixtures are committed, so parity tests
+  run in CI and for contributors without R installed; R is needed only to
+  regenerate them.
+- `make parity` and `make fixtures` targets.
+
+### Documented
+
+- One known divergence from R in direct calibration. `QCA::calibrate` ends with
+  `fs[fs < 1e-04] <- 0; fs[fs > 0.9999] <- 1`, so R reports extreme memberships
+  as exactly 0 or 1 while setqca reports the value of the transformation. Within
+  the anchors the two agree to machine precision. The divergence is bounded by
+  `1e-4`, cannot change a truth-table corner assignment, and is pinned by a test
+  so it cannot widen unnoticed.
+
+### Removed
+
+- `validation/r/parity.R` and `validation/parity_input.csv`, a stub that printed
+  one truth table for a toy dataset. Superseded by the fixture generator, which
+  produces machine-checked golden values on canonical datasets.
+
 ## [0.1.0] — 2026-08-10
 
 First public release.

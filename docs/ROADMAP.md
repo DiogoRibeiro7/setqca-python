@@ -22,7 +22,11 @@
 - threshold multiverse and robustness API
 - calibration diagnostics
 - XY plots
-- R-QCA golden parity suite
+- extend the R-QCA golden parity suite (calibration, truth tables, fit measures
+  and conservative/parsimonious solutions are already covered as of 0.1;
+  remaining: intermediate solutions, necessity supersets, multi-outcome models)
+- optional R-compatible calibration snapping, so extreme memberships can be
+  reported exactly as R does when replicating an existing analysis
 
 ## 0.3 — multi-value and performance
 

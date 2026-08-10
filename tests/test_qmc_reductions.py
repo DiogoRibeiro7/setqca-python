@@ -12,6 +12,7 @@ from itertools import combinations
 import pytest
 
 from setqca.minimize import minimize, prime_implicants
+from setqca.minimize.implicant import Implicant
 from setqca.minimize.qmc import exact_minimum_covers
 
 
@@ -107,6 +108,28 @@ def test_essential_selection_survives_a_chart_with_don_t_cares() -> None:
     solutions = minimize(on_set, dont_cares={4, 5}, width=3)
     assert len(solutions) == 1
     assert solutions[0].as_expression(("A", "B", "C")) == "A"
+
+
+def test_memoisation_prunes_a_costlier_route_to_the_same_remainder() -> None:
+    """Two primes covering the same rows must not both be expanded.
+
+    ``wide`` and ``narrow`` cover exactly the same positive rows at different
+    literal costs, so whichever is tried second reaches an already-seen set of
+    uncovered rows at a strictly worse cost and is abandoned. The minimum is
+    unaffected, which is the property that makes the pruning sound.
+    """
+    on_set = {0, 1, 5, 7}
+    wide = Implicant((0, None, None), frozenset({0, 1}))  # 1 literal
+    narrow = Implicant((0, 0, None), frozenset({0, 1}))  # 2 literals, same rows
+    pair = Implicant((1, None, 1), frozenset({5, 7}))  # 2 literals
+    single_five = Implicant((1, 0, 1), frozenset({5}))  # 3 literals
+    single_seven = Implicant((1, 1, 1), frozenset({7}))  # 3 literals
+
+    solutions = exact_minimum_covers((wide, narrow, pair, single_five, single_seven), on_set)
+
+    assert len(solutions) == 1
+    assert _cost(solutions[0]) == (2, 3)
+    assert set(solutions[0].implicants) == {wide, pair}
 
 
 def test_exact_minimum_covers_accepts_a_prefiltered_prime_set() -> None:

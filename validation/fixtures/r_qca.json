@@ -1,0 +1,1028 @@
+{
+  "generated_with": {
+    "R": "4.5.1",
+    "QCA": "3.25"
+  },
+  "r_snapping": {
+    "low": 0.0001,
+    "high": 0.9999,
+    "source": "QCA::calibrate ends with fs[fs < 1e-04] <- 0; fs[fs > 0.9999] <- 1"
+  },
+  "note": "Golden values from the reference CRAN QCA implementation. Regenerate with: Rscript validation/r/generate_fixtures.R",
+  "calibration": [
+    {
+      "id": "increasing-logistic-idm95",
+      "values": [0, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -50, 150],
+      "thresholds": [20, 50, 80],
+      "idm": 0.95,
+      "logistic": true,
+      "expected": [0.00733745807066141, 0.01934249769983508, 0.05000000000000005, 0.07916845804317633, 0.1231471380298757, 0.2725982855090026, 0.5, 0.7274017144909974, 0.8768528619701244, 0.9208315419568237, 0.9499999999999998, 0.9806575023001649, 0.9926625419293386, 0, 1]
+    },
+    {
+      "id": "decreasing-logistic-idm95",
+      "values": [0, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -50, 150],
+      "thresholds": [80, 50, 20],
+      "idm": 0.95,
+      "logistic": true,
+      "expected": [0.9926625419293386, 0.9806575023001649, 0.95, 0.9208315419568237, 0.8768528619701244, 0.7274017144909974, 0.5, 0.2725982855090026, 0.1231471380298756, 0.07916845804317629, 0.05000000000000016, 0.01934249769983509, 0.00733745807066144, 1, 0]
+    },
+    {
+      "id": "increasing-logistic-idm99",
+      "values": [0, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -50, 150],
+      "thresholds": [20, 50, 80],
+      "idm": 0.99,
+      "logistic": true,
+      "expected": [0.0004717766085013785, 0.002178742102633038, 0.01000000000000001, 0.02126358167546157, 0.04464190557436309, 0.1777441246000219, 0.5, 0.8222558753999781, 0.9553580944256369, 0.9787364183245384, 0.99, 0.997821257897367, 0.9995282233914986, 0, 1]
+    },
+    {
+      "id": "increasing-linear",
+      "values": [0, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -50, 150],
+      "thresholds": [20, 50, 80],
+      "idm": 0.95,
+      "logistic": false,
+      "expected": [0, 0, 0, 0.08333333333333333, 0.1666666666666667, 0.3333333333333333, 0.5, 0.6666666666666667, 0.8333333333333334, 0.9166666666666666, 1, 1, 1, 0, 1]
+    }
+  ],
+  "pof": [
+    {
+      "expression": "DEV*URB",
+      "outcome": "SURV",
+      "relation": "sufficiency",
+      "consistency": 0.8133874239350914,
+      "coverage": 0.4706572769953052,
+      "pri": 0.7761557177615573
+    },
+    {
+      "expression": "DEV*~URB",
+      "outcome": "SURV",
+      "relation": "sufficiency",
+      "consistency": 0.7449799196787148,
+      "coverage": 0.4354460093896713,
+      "pri": 0.6856435643564355
+    },
+    {
+      "expression": "DEV",
+      "outcome": "SURV",
+      "relation": "sufficiency",
+      "consistency": 0.7746170678336981,
+      "coverage": 0.8309859154929577,
+      "pri": 0.7431421446384042
+    },
+    {
+      "expression": "LIT",
+      "outcome": "SURV",
+      "relation": "necessity",
+      "consistency": 0.9906103286384976,
+      "coverage": 0.6428027418126427,
+      "ron": 0.5094142259414226
+    },
+    {
+      "expression": "DEV",
+      "outcome": "SURV",
+      "relation": "necessity",
+      "consistency": 0.8309859154929577,
+      "coverage": 0.7746170678336981,
+      "ron": 0.8113553113553114
+    },
+    {
+      "expression": "DEV+URB",
+      "outcome": "SURV",
+      "relation": "necessity",
+      "consistency": 0.8990610328638499,
+      "coverage": 0.7539370078740159,
+      "ron": 0.7582205029013538
+    }
+  ],
+  "analyses": [
+    {
+      "id": "LF-SURV-incl80",
+      "dataset": "LF",
+      "outcome": "SURV",
+      "conditions": ["DEV", "URB", "LIT", "IND", "STB"],
+      "incl_cut": 0.8,
+      "n_cut": 1,
+      "data": {
+        "DEV": [0.8100000000000001, 0.99, 0.58, 0.16, 0.58, 0.98, 0.89, 0.04, 0.07000000000000001, 0.72, 0.34, 0.98, 0.02, 0.01, 0.01, 0.03, 0.95, 0.98],
+        "URB": [0.12, 0.89, 0.98, 0.07000000000000001, 0.03, 0.03, 0.79, 0.09, 0.16, 0.05, 0.1, 1, 0.17, 0.02, 0.03, 0.3, 0.13, 0.99],
+        "LIT": [0.99, 0.98, 0.98, 0.98, 0.99, 0.99, 0.99, 0.13, 0.88, 0.98, 0.41, 0.99, 0.59, 0.01, 0.17, 0.09, 0.99, 0.99],
+        "IND": [0.73, 1, 0.9, 0.01, 0.08, 0.8100000000000001, 0.96, 0.36, 0.07000000000000001, 0.01, 0.47, 0.9399999999999999, 0, 0.11, 0, 0.21, 0.67, 1],
+        "STB": [0.43, 0.98, 0.91, 0.91, 0.58, 0.95, 0.31, 0.43, 0.13, 0.95, 0.58, 0.99, 0, 0.01, 0.84, 0.2, 0.91, 0.98],
+        "SURV": [0.05, 0.95, 0.89, 0.12, 0.77, 0.95, 0.05, 0.06, 0.42, 0.92, 0.05, 0.95, 0.12, 0.05, 0.21, 0.06, 0.95, 0.95]
+      },
+      "case_ids": ["AU", "BE", "CZ", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "NL", "PL", "PT", "RO", "ES", "SE", "UK"],
+      "truth_table": [
+        {
+          "minterm": 0,
+          "configuration": [0, 0, 0, 0, 0],
+          "n": 3,
+          "consistency": 0.215976331360947,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 1,
+          "configuration": [0, 0, 0, 0, 1],
+          "n": 2,
+          "consistency": 0.278026905829596,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 2,
+          "configuration": [0, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 3,
+          "configuration": [0, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 4,
+          "configuration": [0, 0, 1, 0, 0],
+          "n": 2,
+          "consistency": 0.520900321543409,
+          "pri": 0.113095238095238,
+          "out": "0"
+        },
+        {
+          "minterm": 5,
+          "configuration": [0, 0, 1, 0, 1],
+          "n": 1,
+          "consistency": 0.528571428571429,
+          "pri": 0.228070175438597,
+          "out": "0"
+        },
+        {
+          "minterm": 6,
+          "configuration": [0, 0, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 7,
+          "configuration": [0, 0, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 8,
+          "configuration": [0, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 9,
+          "configuration": [0, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 10,
+          "configuration": [0, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 11,
+          "configuration": [0, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 12,
+          "configuration": [0, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 13,
+          "configuration": [0, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 14,
+          "configuration": [0, 1, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 15,
+          "configuration": [0, 1, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 16,
+          "configuration": [1, 0, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 17,
+          "configuration": [1, 0, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 18,
+          "configuration": [1, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 19,
+          "configuration": [1, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 20,
+          "configuration": [1, 0, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 21,
+          "configuration": [1, 0, 1, 0, 1],
+          "n": 2,
+          "consistency": 0.804270462633452,
+          "pri": 0.719387755102041,
+          "out": "1"
+        },
+        {
+          "minterm": 22,
+          "configuration": [1, 0, 1, 1, 0],
+          "n": 1,
+          "consistency": 0.378205128205128,
+          "pri": 0.0396039603960395,
+          "out": "0"
+        },
+        {
+          "minterm": 23,
+          "configuration": [1, 0, 1, 1, 1],
+          "n": 2,
+          "consistency": 0.7087719298245621,
+          "pri": 0.634361233480176,
+          "out": "0"
+        },
+        {
+          "minterm": 24,
+          "configuration": [1, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 25,
+          "configuration": [1, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 26,
+          "configuration": [1, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 27,
+          "configuration": [1, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 28,
+          "configuration": [1, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 29,
+          "configuration": [1, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 30,
+          "configuration": [1, 1, 1, 1, 0],
+          "n": 1,
+          "consistency": 0.445255474452555,
+          "pri": 0.0499999999999999,
+          "out": "0"
+        },
+        {
+          "minterm": 31,
+          "configuration": [1, 1, 1, 1, 1],
+          "n": 4,
+          "consistency": 0.904205607476635,
+          "pri": 0.885793871866295,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        ["DEV*URB*LIT*IND*STB", "DEV*~URB*LIT*~IND*STB"]
+      ],
+      "parsimonious": [
+        ["DEV*~IND", "URB*STB"]
+      ]
+    },
+    {
+      "id": "LF-SURV-incl90",
+      "dataset": "LF",
+      "outcome": "SURV",
+      "conditions": ["DEV", "URB", "LIT", "IND", "STB"],
+      "incl_cut": 0.9,
+      "n_cut": 1,
+      "data": {
+        "DEV": [0.8100000000000001, 0.99, 0.58, 0.16, 0.58, 0.98, 0.89, 0.04, 0.07000000000000001, 0.72, 0.34, 0.98, 0.02, 0.01, 0.01, 0.03, 0.95, 0.98],
+        "URB": [0.12, 0.89, 0.98, 0.07000000000000001, 0.03, 0.03, 0.79, 0.09, 0.16, 0.05, 0.1, 1, 0.17, 0.02, 0.03, 0.3, 0.13, 0.99],
+        "LIT": [0.99, 0.98, 0.98, 0.98, 0.99, 0.99, 0.99, 0.13, 0.88, 0.98, 0.41, 0.99, 0.59, 0.01, 0.17, 0.09, 0.99, 0.99],
+        "IND": [0.73, 1, 0.9, 0.01, 0.08, 0.8100000000000001, 0.96, 0.36, 0.07000000000000001, 0.01, 0.47, 0.9399999999999999, 0, 0.11, 0, 0.21, 0.67, 1],
+        "STB": [0.43, 0.98, 0.91, 0.91, 0.58, 0.95, 0.31, 0.43, 0.13, 0.95, 0.58, 0.99, 0, 0.01, 0.84, 0.2, 0.91, 0.98],
+        "SURV": [0.05, 0.95, 0.89, 0.12, 0.77, 0.95, 0.05, 0.06, 0.42, 0.92, 0.05, 0.95, 0.12, 0.05, 0.21, 0.06, 0.95, 0.95]
+      },
+      "case_ids": ["AU", "BE", "CZ", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "NL", "PL", "PT", "RO", "ES", "SE", "UK"],
+      "truth_table": [
+        {
+          "minterm": 0,
+          "configuration": [0, 0, 0, 0, 0],
+          "n": 3,
+          "consistency": 0.215976331360947,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 1,
+          "configuration": [0, 0, 0, 0, 1],
+          "n": 2,
+          "consistency": 0.278026905829596,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 2,
+          "configuration": [0, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 3,
+          "configuration": [0, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 4,
+          "configuration": [0, 0, 1, 0, 0],
+          "n": 2,
+          "consistency": 0.520900321543409,
+          "pri": 0.113095238095238,
+          "out": "0"
+        },
+        {
+          "minterm": 5,
+          "configuration": [0, 0, 1, 0, 1],
+          "n": 1,
+          "consistency": 0.528571428571429,
+          "pri": 0.228070175438597,
+          "out": "0"
+        },
+        {
+          "minterm": 6,
+          "configuration": [0, 0, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 7,
+          "configuration": [0, 0, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 8,
+          "configuration": [0, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 9,
+          "configuration": [0, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 10,
+          "configuration": [0, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 11,
+          "configuration": [0, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 12,
+          "configuration": [0, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 13,
+          "configuration": [0, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 14,
+          "configuration": [0, 1, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 15,
+          "configuration": [0, 1, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 16,
+          "configuration": [1, 0, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 17,
+          "configuration": [1, 0, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 18,
+          "configuration": [1, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 19,
+          "configuration": [1, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 20,
+          "configuration": [1, 0, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 21,
+          "configuration": [1, 0, 1, 0, 1],
+          "n": 2,
+          "consistency": 0.804270462633452,
+          "pri": 0.719387755102041,
+          "out": "0"
+        },
+        {
+          "minterm": 22,
+          "configuration": [1, 0, 1, 1, 0],
+          "n": 1,
+          "consistency": 0.378205128205128,
+          "pri": 0.0396039603960395,
+          "out": "0"
+        },
+        {
+          "minterm": 23,
+          "configuration": [1, 0, 1, 1, 1],
+          "n": 2,
+          "consistency": 0.7087719298245621,
+          "pri": 0.634361233480176,
+          "out": "0"
+        },
+        {
+          "minterm": 24,
+          "configuration": [1, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 25,
+          "configuration": [1, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 26,
+          "configuration": [1, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 27,
+          "configuration": [1, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 28,
+          "configuration": [1, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 29,
+          "configuration": [1, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 30,
+          "configuration": [1, 1, 1, 1, 0],
+          "n": 1,
+          "consistency": 0.445255474452555,
+          "pri": 0.0499999999999999,
+          "out": "0"
+        },
+        {
+          "minterm": 31,
+          "configuration": [1, 1, 1, 1, 1],
+          "n": 4,
+          "consistency": 0.904205607476635,
+          "pri": 0.885793871866295,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        "DEV*URB*LIT*IND*STB"
+      ],
+      "parsimonious": [
+        "URB*STB"
+      ]
+    },
+    {
+      "id": "LC-SURV-crisp",
+      "dataset": "LC",
+      "outcome": "SURV",
+      "conditions": ["DEV", "URB", "LIT", "IND", "STB"],
+      "incl_cut": 1,
+      "n_cut": 1,
+      "data": {
+        "DEV": [1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1],
+        "URB": [0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        "LIT": [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
+        "IND": [1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1],
+        "STB": [0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1],
+        "SURV": [0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1]
+      },
+      "case_ids": ["AU", "BE", "CZ", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "NL", "PL", "PT", "RO", "ES", "SE", "UK"],
+      "truth_table": [
+        {
+          "minterm": 0,
+          "configuration": [0, 0, 0, 0, 0],
+          "n": 3,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 1,
+          "configuration": [0, 0, 0, 0, 1],
+          "n": 2,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 2,
+          "configuration": [0, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 3,
+          "configuration": [0, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 4,
+          "configuration": [0, 0, 1, 0, 0],
+          "n": 2,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 5,
+          "configuration": [0, 0, 1, 0, 1],
+          "n": 1,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 6,
+          "configuration": [0, 0, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 7,
+          "configuration": [0, 0, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 8,
+          "configuration": [0, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 9,
+          "configuration": [0, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 10,
+          "configuration": [0, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 11,
+          "configuration": [0, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 12,
+          "configuration": [0, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 13,
+          "configuration": [0, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 14,
+          "configuration": [0, 1, 1, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 15,
+          "configuration": [0, 1, 1, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 16,
+          "configuration": [1, 0, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 17,
+          "configuration": [1, 0, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 18,
+          "configuration": [1, 0, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 19,
+          "configuration": [1, 0, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 20,
+          "configuration": [1, 0, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 21,
+          "configuration": [1, 0, 1, 0, 1],
+          "n": 2,
+          "consistency": 1,
+          "pri": 1,
+          "out": "1"
+        },
+        {
+          "minterm": 22,
+          "configuration": [1, 0, 1, 1, 0],
+          "n": 1,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 23,
+          "configuration": [1, 0, 1, 1, 1],
+          "n": 2,
+          "consistency": 1,
+          "pri": 1,
+          "out": "1"
+        },
+        {
+          "minterm": 24,
+          "configuration": [1, 1, 0, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 25,
+          "configuration": [1, 1, 0, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 26,
+          "configuration": [1, 1, 0, 1, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 27,
+          "configuration": [1, 1, 0, 1, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 28,
+          "configuration": [1, 1, 1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 29,
+          "configuration": [1, 1, 1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 30,
+          "configuration": [1, 1, 1, 1, 0],
+          "n": 1,
+          "consistency": 0,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 31,
+          "configuration": [1, 1, 1, 1, 1],
+          "n": 4,
+          "consistency": 1,
+          "pri": 1,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        ["DEV*~URB*LIT*STB", "DEV*LIT*IND*STB"]
+      ],
+      "parsimonious": [
+        "DEV*STB"
+      ]
+    },
+    {
+      "id": "LF-SURV-three",
+      "dataset": "LF",
+      "outcome": "SURV",
+      "conditions": ["DEV", "LIT", "STB"],
+      "incl_cut": 0.8,
+      "n_cut": 1,
+      "data": {
+        "DEV": [0.8100000000000001, 0.99, 0.58, 0.16, 0.58, 0.98, 0.89, 0.04, 0.07000000000000001, 0.72, 0.34, 0.98, 0.02, 0.01, 0.01, 0.03, 0.95, 0.98],
+        "LIT": [0.99, 0.98, 0.98, 0.98, 0.99, 0.99, 0.99, 0.13, 0.88, 0.98, 0.41, 0.99, 0.59, 0.01, 0.17, 0.09, 0.99, 0.99],
+        "STB": [0.43, 0.98, 0.91, 0.91, 0.58, 0.95, 0.31, 0.43, 0.13, 0.95, 0.58, 0.99, 0, 0.01, 0.84, 0.2, 0.91, 0.98],
+        "SURV": [0.05, 0.95, 0.89, 0.12, 0.77, 0.95, 0.05, 0.06, 0.42, 0.92, 0.05, 0.95, 0.12, 0.05, 0.21, 0.06, 0.95, 0.95]
+      },
+      "case_ids": ["AU", "BE", "CZ", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "NL", "PL", "PT", "RO", "ES", "SE", "UK"],
+      "truth_table": [
+        {
+          "minterm": 0,
+          "configuration": [0, 0, 0],
+          "n": 3,
+          "consistency": 0.210526315789474,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 1,
+          "configuration": [0, 0, 1],
+          "n": 2,
+          "consistency": 0.281385281385282,
+          "pri": 0,
+          "out": "0"
+        },
+        {
+          "minterm": 2,
+          "configuration": [0, 1, 0],
+          "n": 2,
+          "consistency": 0.524096385542169,
+          "pri": 0.107344632768362,
+          "out": "0"
+        },
+        {
+          "minterm": 3,
+          "configuration": [0, 1, 1],
+          "n": 1,
+          "consistency": 0.584337349397591,
+          "pri": 0.336538461538462,
+          "out": "0"
+        },
+        {
+          "minterm": 4,
+          "configuration": [1, 0, 0],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 5,
+          "configuration": [1, 0, 1],
+          "n": 0,
+          "consistency": null,
+          "pri": null,
+          "out": "R"
+        },
+        {
+          "minterm": 6,
+          "configuration": [1, 1, 0],
+          "n": 2,
+          "consistency": 0.446564885496184,
+          "pri": 0.136904761904762,
+          "out": "0"
+        },
+        {
+          "minterm": 7,
+          "configuration": [1, 1, 1],
+          "n": 8,
+          "consistency": 0.868811881188119,
+          "pri": 0.848137535816619,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        "DEV*LIT*STB"
+      ],
+      "parsimonious": [
+        "DEV*STB"
+      ]
+    }
+  ]
+}
