@@ -4,6 +4,14 @@ title: "setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative Comparative An
 version: "0.1.0"
 date-released: 2026-08-10
 type: software
+doi: 10.5281/zenodo.21879360
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21879359
+    description: Concept DOI resolving to the latest archived version
+  - type: doi
+    value: 10.5281/zenodo.21879360
+    description: Version DOI for release 0.1.0
 authors:
   - family-names: Ribeiro
     given-names: Diogo

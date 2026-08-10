@@ -2,8 +2,9 @@
 
 [![CI](https://github.com/DiogoRibeiro7/setqca-python/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/setqca-python/actions/workflows/ci.yml)
 [![Documentation](https://github.com/DiogoRibeiro7/setqca-python/actions/workflows/docs.yml/badge.svg)](https://diogoribeiro7.github.io/setqca-python/)
-[![PyPI](https://img.shields.io/pypi/v/setqca.svg)](https://pypi.org/project/setqca/)
-[![Python](https://img.shields.io/pypi/pyversions/setqca.svg)](https://pypi.org/project/setqca/)
+[![PyPI](https://img.shields.io/pypi/v/setqca?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/setqca/)
+[![Python](https://img.shields.io/pypi/pyversions/setqca?logo=python&logoColor=white&label=Python)](https://pypi.org/project/setqca/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21879359.svg)](https://doi.org/10.5281/zenodo.21879359)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Checked with mypy](https://img.shields.io/badge/mypy-strict-blue.svg)](https://mypy-lang.org/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -217,9 +218,22 @@ mathematical core.
 
 ## Citing
 
-If you use `setqca` in published research, please cite the archived release.
+If you use `setqca` in published research, please cite the archived release:
+
+> Ribeiro, D. (2026). *setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative
+> Comparative Analysis* (version 0.1.0) [Computer software]. Zenodo.
+> <https://doi.org/10.5281/zenodo.21879360>
+
+Two DOIs are available. Cite the **version DOI**
+([10.5281/zenodo.21879360](https://doi.org/10.5281/zenodo.21879360)) when the
+exact version matters for reproducibility, which for a set-theoretic method it
+usually does. Cite the **concept DOI**
+([10.5281/zenodo.21879359](https://doi.org/10.5281/zenodo.21879359)) to refer to
+the project as a whole; it always resolves to the latest archived release.
+
 Machine-readable metadata is provided in [`CITATION.cff`](CITATION.cff),
-[`codemeta.json`](codemeta.json) and [`.zenodo.json`](.zenodo.json).
+[`codemeta.json`](codemeta.json) and [`.zenodo.json`](.zenodo.json). GitHub
+renders "Cite this repository" from the first of these.
 
 ## License
 

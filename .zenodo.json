@@ -40,6 +40,11 @@
       "identifier": "https://github.com/DiogoRibeiro7/setqca-python",
       "relation": "isSupplementTo",
       "scheme": "url"
+    },
+    {
+      "identifier": "https://pypi.org/project/setqca/",
+      "relation": "isIdenticalTo",
+      "scheme": "url"
     }
   ]
 }

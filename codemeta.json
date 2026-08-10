@@ -26,7 +26,9 @@
     "Python"
   ],
   "datePublished": "2026-08-10",
-  "identifier": "https://github.com/DiogoRibeiro7/setqca-python",
+  "identifier": "https://doi.org/10.5281/zenodo.21879360",
+  "sameAs": "https://doi.org/10.5281/zenodo.21879359",
+  "downloadUrl": "https://pypi.org/project/setqca/",
   "author": [
     {
       "@type": "Person",

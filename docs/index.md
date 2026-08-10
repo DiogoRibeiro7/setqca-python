@@ -52,8 +52,16 @@ Continue with [Getting started](getting-started.md), or jump to the
 
 ## Citing
 
-If you use `setqca` in published research, please cite the archived release.
-Citation metadata is provided in [`CITATION.cff`](https://github.com/DiogoRibeiro7/setqca-python/blob/main/CITATION.cff).
+If you use `setqca` in published research, please cite the archived release:
+
+> Ribeiro, D. (2026). *setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative
+> Comparative Analysis* (version 0.1.0) [Computer software]. Zenodo.
+> <https://doi.org/10.5281/zenodo.21879360>
+
+Cite the version DOI above when the exact version matters for reproducibility;
+cite the concept DOI [10.5281/zenodo.21879359](https://doi.org/10.5281/zenodo.21879359)
+to refer to the project as a whole. Citation metadata is provided in
+[`CITATION.cff`](https://github.com/DiogoRibeiro7/setqca-python/blob/main/CITATION.cff).
 
 ## License
 

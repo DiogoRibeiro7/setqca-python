@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] — 2026-08-10
 
 First public release.
+Archived on Zenodo: [10.5281/zenodo.21879360](https://doi.org/10.5281/zenodo.21879360)
+(concept DOI [10.5281/zenodo.21879359](https://doi.org/10.5281/zenodo.21879359)).
 
 ### Added
 
