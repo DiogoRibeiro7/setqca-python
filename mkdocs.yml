@@ -42,6 +42,7 @@ nav:
   - Getting started: getting-started.md
   - User guide:
       - Calibration: guide/calibration.md
+      - Expressions: guide/expressions.md
       - Truth tables: guide/truth-tables.md
       - Minimisation: guide/minimisation.md
   - Methodology: METHODOLOGY.md
