@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use setqca in your research, please cite the archived release."
+title: "setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative Comparative Analysis"
+version: "0.1.0"
+date-released: 2026-08-09
+type: software
+authors:
+  - family-names: Ribeiro
+    given-names: Diogo
+    affiliation: ESMAD - Instituto Politécnico do Porto
+    email: dfr@esmad.ipp.pt
+    orcid: https://orcid.org/0009-0001-2022-7072
+license: MIT
+repository-code: https://github.com/DiogoRibeiro7/setqca-python
+url: https://github.com/DiogoRibeiro7/setqca-python
+abstract: |
+  setqca is an open-source Python library implementing the mathematical core of
+  Qualitative Comparative Analysis (QCA) natively, without wrapping the R QCA
+  package. It provides three-anchor direct fuzzy calibration in logistic and
+  piecewise forms, crisp calibration, a typed fuzzy-set algebra over calibrated
+  conditions, set-theoretic parameters of fit for sufficiency and necessity
+  including PRI and RoN, complete binary truth tables with frequency,
+  consistency and PRI cutoffs, and exact classical Quine-McCluskey Boolean
+  minimisation with branch-and-bound solution of the prime-implicant chart.
+  Conservative and parsimonious csQCA and fsQCA solutions are returned as typed
+  result objects with pandas exports. The implementation prioritises auditable
+  exactness over heuristic speed: minimisation is exact rather than approximate,
+  every threshold is explicit, and features that have not yet reached parity
+  with the reference R implementation are marked experimental rather than
+  silently approximated. The package is fully type annotated, ships a py.typed
+  marker, and is validated by unit, property-based and brute-force exactness
+  tests.
+keywords:
+  - qualitative comparative analysis
+  - QCA
+  - fsQCA
+  - csQCA
+  - set-theoretic methods
+  - fuzzy sets
+  - Boolean minimisation
+  - Quine-McCluskey
+  - configurational comparative methods
+  - social science methodology

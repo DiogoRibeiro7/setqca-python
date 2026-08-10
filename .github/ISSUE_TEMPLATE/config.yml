@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or methodological discussion
+    url: https://github.com/DiogoRibeiro7/setqca-python/discussions
+    about: Ask about QCA methodology, calibration choices, or how to use the API.
+  - name: Security vulnerability
+    url: https://github.com/DiogoRibeiro7/setqca-python/security/advisories/new
+    about: Report a vulnerability privately. Please do not open a public issue.

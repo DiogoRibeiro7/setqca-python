@@ -1,0 +1,52 @@
+name: Feature request
+description: Propose a new method, parameter, or API capability
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check [the roadmap](https://github.com/DiogoRibeiro7/setqca-python/blob/main/docs/ROADMAP.md)
+        first — several commonly requested features are already scheduled.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: The analytical task you cannot currently carry out.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or method
+      description: Sketch the interface, or name the algorithm precisely.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Methodological references
+      description: |
+        Papers, textbook sections, or the equivalent R `QCA` function. Changes
+        to the mathematical core require a published definition.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this touch?
+      options:
+        - Calibration
+        - Parameters of fit
+        - Truth table
+        - Boolean minimisation
+        - Result objects and exports
+        - Documentation
+        - Other
+    validations:
+      required: true

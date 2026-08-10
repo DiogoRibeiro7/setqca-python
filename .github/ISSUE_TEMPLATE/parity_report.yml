@@ -1,0 +1,61 @@
+name: Parity divergence
+description: Report a numerical divergence from the reference R QCA implementation
+title: "[Parity]: "
+labels: ["parity", "scientific-correctness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The R `QCA` package is the reference implementation for parity testing.
+        A confirmed divergence in a stable feature is treated as a correctness
+        bug, not an enhancement.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which component diverges?
+      options:
+        - Direct calibration
+        - Truth-table row assignment
+        - Consistency / coverage
+        - PRI
+        - RoN
+        - Prime implicants
+        - Conservative solution
+        - Parsimonious solution
+        - Intermediate solution (known experimental)
+    validations:
+      required: true
+
+  - type: textarea
+    id: dataset
+    attributes:
+      label: Dataset
+      description: CSV contents, or the name of a canonical published dataset.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: python_output
+    attributes:
+      label: setqca code and output
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: r_output
+    attributes:
+      label: R QCA code and output
+      render: r
+    validations:
+      required: true
+
+  - type: input
+    id: r_version
+    attributes:
+      label: R QCA package version
+      placeholder: "3.21"
+    validations:
+      required: true

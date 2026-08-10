@@ -1,0 +1,10 @@
+# Default owner for everything in the repository.
+*                       @DiogoRibeiro7
+
+# The mathematical core carries the scientific-correctness guarantee and must
+# not change without explicit review.
+/src/setqca/minimize/   @DiogoRibeiro7
+/src/setqca/metrics.py  @DiogoRibeiro7
+/src/setqca/calibration.py @DiogoRibeiro7
+/docs/METHODOLOGY.md    @DiogoRibeiro7
+/validation/            @DiogoRibeiro7

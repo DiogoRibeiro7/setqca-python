@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DiogoRibeiro7"
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      # Development tooling churns fast; batch it into a single review.
+      dev-tooling:
+        patterns:
+          - "ruff"
+          - "mypy"
+          - "pytest*"
+          - "pre-commit"
+          - "hypothesis"
+          - "pandas-stubs"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DiogoRibeiro7"
+    labels:
+      - "dependencies"
+      - "github-actions"

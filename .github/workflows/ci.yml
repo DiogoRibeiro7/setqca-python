@@ -1,0 +1,166 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to keep the queue short.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  POETRY_VERSION: "2.2.1"
+  PYTHONHASHSEED: "0"
+
+jobs:
+  quality:
+    name: Lint, format and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # numpy ships PEP 695 stubs, so mypy needs 3.12+ semantics.
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction
+
+      - name: Verify the lock file matches pyproject.toml
+        run: poetry check --lock
+
+      - name: Ruff lint
+        run: poetry run ruff check --output-format=github .
+
+      - name: Ruff format
+        run: poetry run ruff format --check --diff .
+
+      - name: Mypy (strict)
+        run: poetry run mypy
+
+  test:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction
+
+      - name: Run tests with coverage
+        run: poetry run pytest --cov=setqca --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  examples:
+    name: Examples and benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run the documented example end to end
+        run: poetry run python examples/basic_fsqca.py
+
+      - name: Run the minimisation benchmark
+        run: poetry run python benchmarks/benchmark_qmc.py
+
+  build:
+    name: Build and verify distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Build sdist and wheel
+        run: poetry build
+
+      - name: Check distribution metadata
+        run: |
+          python -m pip install --upgrade twine
+          python -m twine check --strict dist/*
+
+      - name: Verify the wheel installs and imports cleanly
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/python -m pip install --quiet dist/*.whl
+          /tmp/smoke/bin/python - <<'PY'
+          import pandas as pd
+          import setqca
+          from setqca import CSQCA
+
+          assert setqca.__version__
+          data = pd.DataFrame({"A": [1, 1, 0], "B": [1, 0, 0], "Y": [1, 1, 0]})
+          result = CSQCA().fit(data, outcome="Y", conditions=["A", "B"])
+          assert result.parsimonious[0].expression(result.conditions) == "A"
+          print("smoke test passed for setqca", setqca.__version__)
+          PY
+
+      - name: Confirm the wheel ships the typing marker
+        run: python -c "import zipfile,glob,sys; w=glob.glob('dist/*.whl')[0]; names=zipfile.ZipFile(w).namelist(); sys.exit(0 if 'setqca/py.typed' in names else 'py.typed missing from wheel')"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist/
+
+  docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install --with docs --no-interaction
+
+      - name: Build the site in strict mode
+        run: poetry run mkdocs build --strict

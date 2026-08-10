@@ -1,0 +1,162 @@
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+name = "setqca"
+version = "0.1.0"
+description = "Native Python toolkit for crisp-set and fuzzy-set Qualitative Comparative Analysis"
+readme = "README.md"
+requires-python = ">=3.11,<4.0"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Diogo Ribeiro", email = "dfr@esmad.ipp.pt" }]
+maintainers = [{ name = "Diogo Ribeiro", email = "dfr@esmad.ipp.pt" }]
+keywords = [
+  "QCA",
+  "fsQCA",
+  "csQCA",
+  "qualitative-comparative-analysis",
+  "set-theoretic-methods",
+  "boolean-minimisation",
+  "quine-mccluskey",
+  "social-science-methods",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Typing :: Typed",
+]
+dependencies = ["numpy>=2.0,<3.0", "pandas>=2.2,<3.0"]
+
+[project.urls]
+Homepage = "https://github.com/DiogoRibeiro7/setqca-python"
+Repository = "https://github.com/DiogoRibeiro7/setqca-python"
+Issues = "https://github.com/DiogoRibeiro7/setqca-python/issues"
+Documentation = "https://diogoribeiro7.github.io/setqca-python/"
+Changelog = "https://github.com/DiogoRibeiro7/setqca-python/blob/main/CHANGELOG.md"
+
+[tool.poetry]
+packages = [{ include = "setqca", from = "src" }]
+include = [{ path = "src/setqca/py.typed", format = ["sdist", "wheel"] }]
+exclude = [
+  "**/__pycache__/**",
+  "**/*.pyc",
+  "benchmarks/**",
+  "docs/**",
+  "examples/**",
+  "tests/**",
+  "validation/**",
+]
+
+[tool.poetry.group.dev.dependencies]
+hypothesis = ">=6.112"
+mypy = ">=1.11"
+pandas-stubs = ">=2.2"
+pre-commit = ">=4.0"
+pytest = ">=8.3"
+pytest-cov = ">=6.0"
+ruff = ">=0.12"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = ">=1.6"
+mkdocs-material = ">=9.5"
+mkdocstrings = { version = ">=0.26", extras = ["python"] }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+  "slow: long-running tests excluded from the default fast feedback loop",
+  "parity: tests comparing results against the reference R QCA implementation",
+]
+filterwarnings = ["error"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = ["docs/_build", "site"]
+
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "F",    # pyflakes
+  "I",    # isort
+  "B",    # flake8-bugbear
+  "C4",   # flake8-comprehensions
+  "UP",   # pyupgrade
+  "SIM",  # flake8-simplify
+  "RUF",  # ruff-specific rules
+  "D",    # pydocstyle
+  "ANN",  # flake8-annotations
+  "PT",   # flake8-pytest-style
+  "N",    # pep8-naming
+  "NPY",  # numpy-specific rules
+  "PERF", # perflint
+  "RET",  # flake8-return
+  "TID",  # flake8-tidy-imports
+]
+ignore = [
+  "D105", # magic methods are self-describing here
+  "D107", # dataclass __init__ is documented on the class
+  "D203", # incompatible with D211
+  "D213", # incompatible with D212
+]
+
+[tool.ruff.lint.per-file-ignores]
+# QCA notation writes conditions as uppercase letters, so N806 is expected in
+# test and example code that mirrors the published notation.
+"tests/**" = ["D100", "D101", "D102", "D103", "ANN001", "ANN201", "N806"]
+"benchmarks/**" = ["D100", "D103"]
+"examples/**" = ["D100", "N806"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+
+[tool.mypy]
+# numpy>=2.3 ships stubs using PEP 695 `type` statements, which mypy only parses
+# under Python 3.12+ semantics. The runtime still supports 3.11; `ruff` enforces
+# 3.11-compatible syntax via target-version.
+python_version = "3.12"
+strict = true
+packages = ["setqca"]
+warn_unreachable = true
+enable_error_code = [
+  "ignore-without-code",
+  "redundant-expr",
+  "truthy-bool",
+]
+
+[tool.coverage.run]
+source = ["setqca"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+source = ["src/setqca", "*/site-packages/setqca"]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "@(abc\\.)?abstractmethod",
+]

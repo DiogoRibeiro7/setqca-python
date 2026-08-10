@@ -1,0 +1,71 @@
+name: Bug report
+description: Report incorrect behaviour, a crash, or a wrong numerical result
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a report. For **numerical**
+        disagreements, the reference R `QCA` output is the most useful evidence
+        you can attach.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: A clear description of the incorrect behaviour.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      description: |
+        If this is a numerical disagreement, state the expected values and where
+        they come from (R `QCA`, a textbook, a published replication).
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducible example
+      description: Self-contained Python that reproduces the problem, including the data.
+      render: python
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: setqca version
+      description: "Output of `python -c \"import setqca; print(setqca.__version__)\"`"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python and OS
+      placeholder: "Python 3.12.4 on Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Traceback or output
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked that my conditions and outcome are calibrated to `[0, 1]`.
+          required: true
+        - label: I searched existing issues for a duplicate.
+          required: true
