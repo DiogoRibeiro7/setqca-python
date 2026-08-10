@@ -74,10 +74,10 @@ conditions `["A", "B", "C"]` the configuration `A=1, B=1, C=0` is minterm 6.
 Set-valued accessors give direct access to each group:
 
 ```python
-table.positive_minterms       # coded "1"
-table.negative_minterms       # coded "0"
+table.positive_minterms  # coded "1"
+table.negative_minterms  # coded "0"
 table.contradictory_minterms  # coded "C"
-table.remainder_minterms      # coded "R"
+table.remainder_minterms  # coded "R"
 ```
 
 ## Limited diversity

@@ -58,13 +58,15 @@ exclude = [
 ]
 
 [tool.poetry.group.dev.dependencies]
+# Floors track the versions CI runs. ruff in particular changes formatting
+# between releases, so an older local ruff produces a diff CI then rejects.
 hypothesis = ">=6.112"
-mypy = ">=1.11"
+mypy = ">=2.3"
 pandas-stubs = ">=2.2"
 pre-commit = ">=4.0"
-pytest = ">=8.3"
-pytest-cov = ">=6.0"
-ruff = ">=0.12"
+pytest = ">=9.1"
+pytest-cov = ">=7.1"
+ruff = ">=0.16"
 
 [tool.poetry.group.docs]
 optional = true

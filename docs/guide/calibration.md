@@ -63,7 +63,7 @@ far outside the anchors saturate cleanly to 0 or 1 rather than overflowing.
 crossover. Raising `above` accelerates the approach to full membership:
 
 ```python
-calibrate_direct([75], full_out=0, crossover=50, full_in=100, logistic=False)             # 0.750
+calibrate_direct([75], full_out=0, crossover=50, full_in=100, logistic=False)  # 0.750
 calibrate_direct([75], full_out=0, crossover=50, full_in=100, logistic=False, above=2.0)  # 0.875
 ```
 
