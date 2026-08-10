@@ -74,7 +74,9 @@ class Negation(SetExpression):
         return 1.0 - self.operand.evaluate(data)
 
     def __str__(self) -> str:
-        return f"~{self.operand}"
+        from .expressions import format_expression
+
+        return format_expression(self)
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,7 +93,9 @@ class Intersection(SetExpression):
         return reduce(np.minimum, arrays)
 
     def __str__(self) -> str:
-        return "*".join(str(item) for item in self.operands)
+        from .expressions import format_expression
+
+        return format_expression(self)
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,4 +112,6 @@ class Union(SetExpression):
         return reduce(np.maximum, arrays)
 
     def __str__(self) -> str:
-        return "+".join(str(item) for item in self.operands)
+        from .expressions import format_expression
+
+        return format_expression(self)
