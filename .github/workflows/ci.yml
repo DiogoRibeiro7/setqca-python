@@ -141,7 +141,7 @@ jobs:
       - name: Confirm the wheel ships the typing marker
         run: python -c "import zipfile,glob,sys; w=glob.glob('dist/*.whl')[0]; names=zipfile.ZipFile(w).namelist(); sys.exit(0 if 'setqca/py.typed' in names else 'py.typed missing from wheel')"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: distributions
           path: dist/
