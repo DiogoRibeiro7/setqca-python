@@ -109,7 +109,11 @@ def _configuration_membership(memberships: FloatArray, config: tuple[int, ...]) 
     states = np.asarray(config, dtype=np.float64)
     # Negated conditions contribute ``1 - x``; asserted conditions contribute ``x``.
     oriented = np.where(states == 1.0, memberships, 1.0 - memberships)
-    return np.min(oriented, axis=1).astype(np.float64)
+    # Bind through an annotated local: the element type numpy's stubs infer for a
+    # reduction varies between releases, and returning it directly makes the
+    # strict-mode result depend on which numpy happens to be installed.
+    membership: FloatArray = np.min(oriented, axis=1).astype(np.float64)
+    return membership
 
 
 def _minterm(config: tuple[int, ...]) -> int:
