@@ -62,7 +62,7 @@ hypothesis = ">=6.112"
 mypy = ">=1.11"
 pandas-stubs = ">=2.2"
 pre-commit = ">=4.0"
-pytest = ">=8.3"
+pytest = ">=9.0.3"
 pytest-cov = ">=6.0"
 ruff = ">=0.12"
 
