@@ -10,6 +10,14 @@ from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
 from .calibration import DirectCalibration, calibrate_crisp, calibrate_direct
+from .expressions import (
+    Configuration,
+    ExpressionSyntaxError,
+    Implication,
+    evaluate_expression,
+    parse_expression,
+    simplify_expression,
+)
 from .metrics import NecessityFit, SufficiencyFit, necessity, sufficiency
 from .minimize import BooleanSolution, Implicant, minimize
 from .models import CSQCA, FSQCA, Direction
@@ -27,10 +35,13 @@ __all__ = [
     "FSQCA",
     "BooleanSolution",
     "Condition",
+    "Configuration",
     "DirectCalibration",
     "Direction",
+    "ExpressionSyntaxError",
     "FittedSolution",
     "Implicant",
+    "Implication",
     "Intersection",
     "NecessityFit",
     "Negation",
@@ -45,7 +56,10 @@ __all__ = [
     "build_truth_table",
     "calibrate_crisp",
     "calibrate_direct",
+    "evaluate_expression",
     "minimize",
     "necessity",
+    "parse_expression",
+    "simplify_expression",
     "sufficiency",
 ]
