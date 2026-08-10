@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use setqca in your research, please cite the archived release."
 title: "setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative Comparative Analysis"
 version: "0.1.0"
-date-released: 2026-08-09
+date-released: 2026-08-10
 type: software
 authors:
   - family-names: Ribeiro
