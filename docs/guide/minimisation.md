@@ -119,6 +119,68 @@ Three reductions cut the search space without ever changing the answer:
 Each is a standard result about prime-implicant charts, and each preserves both
 minimality and the completeness of the returned tie set.
 
+## Inspecting the chart
+
+`minimize` reports its answer. `minimize_chart` reports its reasoning:
+
+```python
+from setqca import minimize_chart
+
+result = minimize_chart(on_set, dont_cares=remainders, width=3)
+print(result.summary(("A", "B", "C")))
+```
+
+```text
+Configurations to cover: 6
+Prime implicants: 6
+Essential primes: 0
+Dominated primes: 0
+Minimum cost: 3 implicants, 6 literals
+Minimum covers: 2
+  ~A*~B + ~A*C + A*B
+  ~A*~C + B*C + A*~B
+```
+
+Three questions the chart answers that a bare solution cannot:
+
+**Why is this term in the solution?**
+
+```python
+print(result.covers[0].explain(("A", "B", "C")))
+```
+
+Each term is labelled either *essential* — the only prime covering some
+configuration, so every possible solution contains it — or *selected among
+interchangeable alternatives*.
+
+**How could this configuration have been covered?**
+
+```python
+result.chart.explain(6, ("A", "B", "C"))
+# 'Row 6 can be covered by any of: A*B, B*C.'
+```
+
+**Why did a plausible-looking term never appear?**
+
+`result.chart.dominated` lists primes that another prime covers entirely at no
+greater literal cost. They cannot appear in any minimum cover, which is usually
+the answer to "why isn't `A*B` in my solution?".
+
+The chart also exports as a table, one row per configuration and one column per
+prime:
+
+```python
+result.chart.to_frame()
+```
+
+!!! note "The chart changes nothing"
+    `minimize_chart` returns exactly the covers `minimize` returns — a
+    parametrised test asserts the two agree. The extra structure is
+    explanation, not a different algorithm.
+
+`result.truncated` reports whether `max_solutions` cut the list of tied covers
+short, so a capped result is never mistaken for an unambiguous one.
+
 ## Fitting solutions back to cases
 
 A Boolean cover is a statement about truth-table rows. To evaluate it against
