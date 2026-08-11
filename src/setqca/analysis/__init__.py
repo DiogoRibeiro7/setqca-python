@@ -16,6 +16,17 @@ from .necessity import (
     NecessityCandidate,
     necessity_analysis,
 )
+from .robustness import (
+    RobustnessAnalysis,
+    RobustnessGrid,
+    RobustnessRun,
+    SolutionSimilarity,
+    Specification,
+    TermStability,
+    calibration_robustness,
+    robustness_analysis,
+    solution_similarity,
+)
 from .sufficiency import (
     CaseDiagnostic,
     CaseRole,
@@ -30,9 +41,18 @@ __all__ = [
     "CaseRole",
     "NecessityAnalysis",
     "NecessityCandidate",
+    "RobustnessAnalysis",
+    "RobustnessGrid",
+    "RobustnessRun",
     "SolutionDiagnostics",
+    "SolutionSimilarity",
+    "Specification",
     "TermDiagnostics",
+    "TermStability",
+    "calibration_robustness",
     "classify_case",
     "necessity_analysis",
+    "robustness_analysis",
+    "solution_similarity",
     "sufficiency_diagnostics",
 ]
