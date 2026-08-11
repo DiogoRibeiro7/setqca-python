@@ -19,7 +19,6 @@
 - enhanced necessity analysis and supersets/subsets
 - contradictory simplifying assumptions
 - solution-specific unique coverage
-- threshold multiverse and robustness API
 - calibration diagnostics
 - XY plots
 - extend the R-QCA golden parity suite (calibration, truth tables, fit measures
