@@ -67,30 +67,35 @@ implementation escapes that. What matters in practice is not the number of
 conditions alone but the *shape* of the chart: how many prime implicants there
 are, and how much they overlap.
 
-The figures below are indicative measurements on ordinary hardware, for a
-typical QCA design: 40 observed cases, about a third of the observed rows
-sufficient, and every remaining row treated as a logical remainder — that is,
-the **parsimonious** solution, which is the more expensive of the two standard
-families because it hands the solver a large don't-care set.
+The figures below come from `benchmarks/profile_phases.py` on ordinary hardware,
+for a typical QCA design: 40 observed cases, an outcome that genuinely depends on
+the conditions, and every unobserved row treated as a logical remainder — that
+is, the **parsimonious** solution, which is the more expensive of the two
+standard families because it hands the solver a large don't-care set.
 
 | Conditions | Truth-table rows | Remainders | Parsimonious solution |
 | --- | --- | --- | --- |
-| 6 | 64 | 24 | ~0.004 s |
-| 7 | 128 | 88 | ~0.05 s |
-| 8 | 256 | 216 | ~0.6 s |
-| 9 | 512 | 472 | ~6 s |
-| 10 | 1 024 | 984 | ~36 s |
+| 6 | 64 | 36 | 0.004 s |
+| 7 | 128 | 95 | 0.009 s |
+| 8 | 256 | 218 | 0.034 s |
+| 9 | 512 | 473 | 0.113 s |
+| 10 | 1 024 | 984 | 0.448 s |
 
-Roughly an order of magnitude per additional condition. Conservative solutions
-are considerably cheaper at the same width, since they use no don't-cares.
+Roughly a trebling per additional condition in this regime, where the cost is
+carried by prime generation and chart construction rather than by the exponential
+search. Conservative solutions are cheaper still at the same width, since they
+use no don't-cares.
 
 Dense tables — where a large fraction of *all* minterms is sufficient — are the
-worst case for the chart solver and degrade sooner. This is the regime
-`benchmarks/benchmark_qmc.py` measures:
+worst case, because they are the regime where the exact search itself dominates.
+At seven conditions, timing the cover phase alone:
 
-```bash
-python benchmarks/benchmark_qmc.py --max-width 9 --density 0.3
-```
+| Sufficient share | Positives | Primes | Cover solving |
+| --- | --- | --- | --- |
+| 0.10 | 11 | 10 | <0.0001 s |
+| 0.25 | 33 | 26 | 0.0001 s |
+| 0.50 | 65 | 53 | 0.0024 s |
+| 0.75 | 91 | 78 | 0.60 s |
 
 Do not extrapolate from either table to your own data; the chart shape matters
 more than the width. If a run does not finish, the practical levers are reducing
@@ -100,6 +105,62 @@ the number of conditions — which is good QCA practice anyway — or lowering
 This cost is the price of exactness. A faster minimiser (CCubes/eQMC-style) is a
 roadmap item, but it will be added as an alternative engine rather than by
 weakening the guarantee of the current one.
+
+## Being told before it gets slow
+
+Exact minimisation is worst-case exponential, and that cost is not negotiable
+here: no heuristic is substituted when a problem gets hard, because a silently
+approximate answer is worse than a slow one. What *is* negotiable is finding out
+in advance.
+
+Once the primes are generated — which is fast — the chart's shape is known, and
+`minimize` warns before entering the exponential phase:
+
+```python
+>>> minimize(large_on_set, width=12)
+MinimizationComplexityWarning: Exact minimisation of 400 configurations over 12
+conditions produced 180 prime implicants (72000 chart cells). Solving the chart
+exactly is worst-case exponential and may take a long time. The result will
+still be exact. To reduce the cost, use fewer conditions, tighten the
+consistency cutoff so fewer configurations qualify, or lower max_solutions if
+the model is highly ambiguous.
+```
+
+The run still completes, and still returns an exact answer. Silence it with
+`warnings.simplefilter`, or switch the check off with `complexity_guard=False`.
+
+The trigger is the **number of prime implicants**, not the number of conditions:
+the density table above is the evidence, and the threshold sits either side of
+the climb between 53 and 78 primes. That climb is driven by how much the primes
+*overlap*, which is why this is a warning rather than a prediction — a chart with
+many primes and little overlap solves instantly.
+
+## Where the time goes
+
+`benchmarks/profile_phases.py` times each phase separately across four
+dimensions — cases, conditions, sufficient configurations and remainders:
+
+```bash
+python benchmarks/profile_phases.py
+python benchmarks/profile_phases.py --max-width 9 --markdown
+```
+
+Two different phases dominate in two different regimes:
+
+- **Remainder-heavy problems** — the parsimonious case, where most of the
+  property space is unobserved — are dominated by prime generation.
+- **Dense on-sets** are dominated by solving the chart.
+
+Truth-table construction barely moves with the number of cases — 25× the cases
+costs under 2× the time, because the work is proportional to the property space,
+not to the sample. Adding cases is cheap; adding *conditions* is not.
+
+!!! note "Measure before optimising"
+    Prime generation was originally the bottleneck at eight conditions, taking
+    1.4 s. Rewriting it over integer masks rather than tuples of optional bits
+    brought that to 0.010 s — the same algorithm, a different representation.
+    The exactness and R-parity tests passed unchanged, which is what made the
+    rewrite safe to keep.
 
 ## How the search stays tractable
 
