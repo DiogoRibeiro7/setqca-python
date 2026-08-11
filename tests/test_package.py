@@ -5,6 +5,9 @@ from __future__ import annotations
 import tomllib
 from importlib.metadata import version
 from pathlib import Path
+from types import ModuleType
+
+import pytest
 
 import setqca
 
@@ -43,6 +46,22 @@ def test_public_api_covers_the_documented_entry_points() -> None:
         "sufficiency",
     }
     assert expected <= set(setqca.__all__)
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["necessity", "sufficiency", "minimize", "calibrate_direct", "evaluate_expression"],
+)
+def test_exported_callables_are_not_shadowed_by_submodules(name: str) -> None:
+    """A submodule sharing a name with an export would silently replace it.
+
+    Importing ``setqca.necessity`` as a module, for instance, rebinds the
+    attribute on the package and turns ``from setqca import necessity`` into a
+    module import. Analysis modules therefore live under ``setqca.analysis``.
+    """
+    exported = getattr(setqca, name)
+    assert callable(exported), f"setqca.{name} is {type(exported).__name__}, not a callable"
+    assert not isinstance(exported, ModuleType)
 
 
 def test_package_ships_a_py_typed_marker() -> None:
