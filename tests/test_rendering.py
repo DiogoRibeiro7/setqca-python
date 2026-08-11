@@ -28,7 +28,17 @@ def test_truth_table_frame_reports_one_row_per_corner(crisp_data: pd.DataFrame) 
     frame = table.to_frame()
 
     assert len(frame) == 4, "a complete truth table has 2**k rows"
-    assert list(frame.columns) == ["A", "B", "minterm", "n", "consistency", "PRI", "OUT", "cases"]
+    assert list(frame.columns) == [
+        "A",
+        "B",
+        "minterm",
+        "n",
+        "consistency",
+        "PRI",
+        "OUT",
+        "cases",
+        "excluded_because",
+    ]
     assert frame["minterm"].tolist() == [0, 1, 2, 3]
     assert frame.loc[frame["minterm"] == 3, "cases"].item() == "c1"
     assert frame.loc[frame["minterm"] == 1, "OUT"].item() == "R"
