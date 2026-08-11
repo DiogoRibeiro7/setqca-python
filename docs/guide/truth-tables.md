@@ -80,6 +80,58 @@ table.contradictory_minterms  # coded "C"
 table.remainder_minterms  # coded "R"
 ```
 
+## Nothing is thrown away
+
+Rows excluded by a threshold are kept, with their classification and the reason
+recorded. A row's outcome code alone conflates situations that call for
+different responses:
+
+```python
+table.positive_rows()   # coded "1"
+table.negative_rows()   # coded "0"
+table.contradictions()  # coded "C"
+table.remainders()      # coded "R"
+table.excluded_rows()   # kept out by a *threshold*, not by the evidence
+print(table.summary())
+```
+
+`excluded_rows()` is the interesting one. It returns rows the frequency or PRI
+cutoff held back — the rows a different analytical choice would have admitted.
+A row with genuinely low consistency is excluded by the data and is *not*
+listed, because no threshold would rescue it.
+
+Every row carries `exclusion_reason` in words:
+
+```text
+frequency 1 below the cutoff of 2
+consistency 0.643 below the inclusion cutoff of 0.8
+PRI 0.412 below the cutoff of 0.7
+```
+
+!!! note "Consistency and PRI fail differently"
+    A row can clear the consistency cutoff and still be excluded by the PRI
+    cutoff. Both are named separately, because the responses differ: low
+    consistency means the configuration does not reliably produce the outcome,
+    while low PRI means it is nearly as good at producing the outcome's
+    negation.
+
+## A table is a reusable object
+
+A truth table carries everything Boolean minimisation needs, so it can be
+stored and re-minimised without recalibrating or rebuilding:
+
+```python
+text = table.to_json()
+restored = TruthTable.from_json(text)
+
+restored.minimize()                            # conservative
+restored.minimize(include_remainders=True)     # parsimonious
+```
+
+Both agree with the estimator exactly — there are tests asserting so. Only the
+*case-level* parameters of fit need the original data, since those describe
+cases rather than configurations; use `FSQCA.fit` for those.
+
 ## Limited diversity
 
 The gap between \(2^k\) logically possible configurations and the handful you
