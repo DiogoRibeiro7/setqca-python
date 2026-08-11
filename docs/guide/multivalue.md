@@ -8,9 +8,7 @@ concept does not have.
 ```python
 from setqca.multivalue import MVQCA
 
-result = MVQCA(consistency=0.8).fit(
-    data, outcome="Y", conditions=["regime", "wealth"]
-)
+result = MVQCA(consistency=0.8).fit(data, outcome="Y", conditions=["regime", "wealth"])
 print(result)
 print(result.truth_table.to_frame())
 print(result.summary_frame("parsimonious"))
@@ -29,8 +27,8 @@ the binary case reduces to familiar QCA notation.
 ## The property space
 
 ```python
-result.domain          # regime{0,1,2}, wealth{0,1}
-result.domain.size     # 6 logically possible configurations
+result.domain  # regime{0,1,2}, wealth{0,1}
+result.domain.size  # 6 logically possible configurations
 ```
 
 Configurations are indexed in mixed radix, which generalises the binary minterm
