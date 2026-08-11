@@ -24,7 +24,17 @@ from .expressions import (
     simplify_expression,
 )
 from .metrics import NecessityFit, SufficiencyFit, necessity, sufficiency
-from .minimize import BooleanSolution, Implicant, minimize
+from .minimize import (
+    BooleanSolution,
+    Implicant,
+    MinimalCover,
+    MinimizationResult,
+    PrimeImplicant,
+    PrimeImplicantChart,
+    build_chart,
+    minimize,
+    minimize_chart,
+)
 from .models import CSQCA, FSQCA, Direction
 from .results import FittedSolution, QCAResult
 from .sets import Condition, Intersection, Negation, SetExpression, Union
@@ -50,8 +60,12 @@ __all__ = [
     "Implicant",
     "Implication",
     "Intersection",
+    "MinimalCover",
+    "MinimizationResult",
     "NecessityFit",
     "Negation",
+    "PrimeImplicant",
+    "PrimeImplicantChart",
     "QCAResult",
     "SetExpression",
     "SufficiencyFit",
@@ -60,12 +74,14 @@ __all__ = [
     "TruthTableRow",
     "Union",
     "__version__",
+    "build_chart",
     "build_truth_table",
     "calibrate_crisp",
     "calibrate_direct",
     "classify_counterfactuals",
     "evaluate_expression",
     "minimize",
+    "minimize_chart",
     "necessity",
     "parse_expression",
     "simplify_expression",
