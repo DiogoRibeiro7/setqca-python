@@ -1313,5 +1313,135 @@
         }
       ]
     }
+  ],
+  "multivalue": [
+    {
+      "id": "regime-wealth",
+      "outcome": "Y",
+      "conditions": ["regime", "wealth"],
+      "incl_cut": 0.8,
+      "data": {
+        "regime": [0, 0, 1, 1, 2, 2, 1, 2],
+        "wealth": [0, 0, 1, 1, 1, 1, 0, 0],
+        "Y": [0, 0, 1, 1, 1, 1, 0, 1]
+      },
+      "truth_table": [
+        {
+          "configuration": [0, 0],
+          "n": 2,
+          "consistency": 0,
+          "out": "0"
+        },
+        {
+          "configuration": [0, 1],
+          "n": 0,
+          "consistency": null,
+          "out": "R"
+        },
+        {
+          "configuration": [1, 0],
+          "n": 1,
+          "consistency": 0,
+          "out": "0"
+        },
+        {
+          "configuration": [1, 1],
+          "n": 2,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [2, 0],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [2, 1],
+          "n": 2,
+          "consistency": 1,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        ["regime[2]", "regime[1]*wealth[1]"]
+      ],
+      "parsimonious": [
+        ["regime[2]", "wealth[1]"]
+      ]
+    },
+    {
+      "id": "three-by-three",
+      "outcome": "Y",
+      "conditions": ["A", "B"],
+      "incl_cut": 0.8,
+      "data": {
+        "A": [0, 1, 2, 0, 1, 2, 0, 1, 2],
+        "B": [0, 0, 0, 1, 1, 1, 2, 2, 2],
+        "Y": [0, 0, 1, 0, 1, 1, 1, 1, 1]
+      },
+      "truth_table": [
+        {
+          "configuration": [0, 0],
+          "n": 1,
+          "consistency": 0,
+          "out": "0"
+        },
+        {
+          "configuration": [0, 1],
+          "n": 1,
+          "consistency": 0,
+          "out": "0"
+        },
+        {
+          "configuration": [0, 2],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [1, 0],
+          "n": 1,
+          "consistency": 0,
+          "out": "0"
+        },
+        {
+          "configuration": [1, 1],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [1, 2],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [2, 0],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [2, 1],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        },
+        {
+          "configuration": [2, 2],
+          "n": 1,
+          "consistency": 1,
+          "out": "1"
+        }
+      ],
+      "conservative": [
+        ["A[2]", "B[2]", "A[1]*B[1]"]
+      ],
+      "parsimonious": [
+        ["A[2]", "B[2]", "A[1]*B[1]"]
+      ]
+    }
   ]
 }
