@@ -12,6 +12,7 @@ from ._validation import FloatArray
 from .metrics import SufficiencyFit, sufficiency
 
 if TYPE_CHECKING:  # pragma: no cover - imported for type checking only
+    from .counterfactuals import CounterfactualAnalysis
     from .minimize.qmc import BooleanSolution
     from .truth_table import TruthTable
 
@@ -46,6 +47,7 @@ class QCAResult:
     parsimonious: tuple[FittedSolution, ...]
     intermediate: tuple[FittedSolution, ...] | None
     intermediate_experimental: bool
+    counterfactuals: CounterfactualAnalysis | None = None
 
     def solutions(self, kind: SolutionKind) -> tuple[FittedSolution, ...]:
         """Return the fitted solutions of one family.
@@ -122,6 +124,13 @@ class QCAResult:
             if self.intermediate_experimental:
                 title += " [experimental]"
             lines.extend(self._format_family(f"{title}:", self.intermediate))
+        if self.counterfactuals is not None:
+            analysis = self.counterfactuals
+            lines.append(
+                f"Counterfactuals: {len(analysis.easy)} easy admitted, "
+                f"{len(analysis.difficult)} difficult refused, "
+                f"of {len(analysis.simplifying_assumptions)} simplifying assumptions"
+            )
         return "\n".join(lines)
 
 

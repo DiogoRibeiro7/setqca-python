@@ -10,6 +10,11 @@ from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
 from .calibration import DirectCalibration, calibrate_crisp, calibrate_direct
+from .counterfactuals import (
+    CounterfactualAnalysis,
+    DirectionalExpectation,
+    classify_counterfactuals,
+)
 from .expressions import (
     Configuration,
     ExpressionSyntaxError,
@@ -36,8 +41,10 @@ __all__ = [
     "BooleanSolution",
     "Condition",
     "Configuration",
+    "CounterfactualAnalysis",
     "DirectCalibration",
     "Direction",
+    "DirectionalExpectation",
     "ExpressionSyntaxError",
     "FittedSolution",
     "Implicant",
@@ -56,6 +63,7 @@ __all__ = [
     "build_truth_table",
     "calibrate_crisp",
     "calibrate_direct",
+    "classify_counterfactuals",
     "evaluate_expression",
     "minimize",
     "necessity",
