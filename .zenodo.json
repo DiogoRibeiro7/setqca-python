@@ -1,8 +1,8 @@
 {
   "title": "setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative Comparative Analysis",
-  "version": "0.1.0",
-  "publication_date": "2026-08-10",
-  "description": "setqca is an open-source Python library implementing the mathematical core of Qualitative Comparative Analysis (QCA) natively, without wrapping the R QCA package. It provides three-anchor direct fuzzy calibration in logistic and piecewise forms, crisp calibration, a typed fuzzy-set algebra over calibrated conditions, set-theoretic parameters of fit for sufficiency and necessity including PRI and RoN, complete binary truth tables with frequency, consistency and PRI cutoffs, and exact classical Quine-McCluskey Boolean minimisation with branch-and-bound solution of the prime-implicant chart. Conservative and parsimonious csQCA and fsQCA solutions are returned as typed result objects with pandas exports. The implementation prioritises auditable exactness over heuristic speed, and marks features that have not yet reached parity with the reference R implementation as experimental rather than approximating them silently.",
+  "version": "0.2.0",
+  "publication_date": "2026-08-11",
+  "description": "setqca is an open-source Python library implementing the mathematical core of Qualitative Comparative Analysis (QCA) natively, without wrapping the R QCA package. It provides crisp, three-anchor direct fuzzy and explicit indirect calibration with diagnostics; a typed configurational expression system with a structural parser; set-theoretic parameters of fit for sufficiency and necessity including PRI, RoN and unique coverage; systematic necessity screening that separates genuine findings from trivial necessity; case-level sufficiency diagnostics; complete truth tables that record why each row was excluded; exact classical Quine-McCluskey minimisation with an inspectable prime-implicant chart; conservative, parsimonious and intermediate solutions following Ragin and Sonnett; multi-value QCA minimised as multi-value cubes rather than Boolean indicators; and robustness sweeps over calibration anchors and truth-table thresholds. Every component is verified against the reference R QCA implementation on canonical datasets, with the two known divergences characterised and pinned by tests.",
   "creators": [
     {
       "name": "Ribeiro, Diogo",

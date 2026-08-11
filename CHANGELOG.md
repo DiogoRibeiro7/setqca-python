@@ -7,20 +7,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-08-11
+
+Every component now matches the reference R `QCA` implementation on the
+canonical datasets, including intermediate solutions, which 0.1.0 computed
+incorrectly. Multi-value QCA, necessity screening, robustness sweeps and
+case-level diagnostics are new.
+
+### Fixed
+
+- **Intermediate solutions were wrong, not merely experimental.** 0.1.0 admitted
+  any remainder that did not contradict the directional expectations. The
+  standard procedure additionally requires the remainder to be reachable from a
+  configuration that *was observed* to be sufficient. With that condition the
+  implementation reproduces R exactly on the Lipset data, including R's split of
+  the twelve simplifying assumptions into one easy and eleven difficult
+  counterfactuals. Results from `summary_frame("intermediate")` will change, and
+  the new values are the correct ones.
+- Nested groups were lost when printing an expression: `(A+B)*C` rendered as
+  `A+B*C`, which re-parses as a different set. The printer now parenthesises by
+  precedence, and round-tripping is property-tested.
+
 ### Added
 
-- Parity test suite against the reference R `QCA` implementation
-  (`tests/test_parity.py`), verified against R `QCA` 3.25 on the canonical
-  Lipset `LF` and `LC` datasets across four analyses. Direct calibration,
-  truth-table coding, case counts, consistency, PRI, sufficiency and necessity
-  fit including RoN, and both conservative and parsimonious solutions all match.
-  Solutions are compared as canonical sets of literal sets rather than as
-  formatted strings.
-- `validation/r/generate_fixtures.R`, which emits golden values to
-  `validation/fixtures/r_qca.json`. The fixtures are committed, so parity tests
-  run in CI and for contributors without R installed; R is needed only to
-  regenerate them.
-- `make parity` and `make fixtures` targets.
+#### Analysis
+
+- `necessity_analysis` screens conditions and their negations for necessity,
+  separating genuine findings from **trivial necessity** — a prevalent condition
+  scoring high consistency while explaining nothing. Disjunctions can be
+  screened for SUIN conditions; conjunctions are excluded because
+  `consistency(A*B) <= min` over the parts, so they can never help.
+- `sufficiency_diagnostics` classifies every case against every term as typical,
+  deviant for consistency in kind or degree, deviant for coverage, or
+  individually irrelevant, and reports **unique coverage**, which 0.1.0 did not
+  compute at all.
+- `robustness_analysis` and `calibration_robustness` sweep consistency, PRI and
+  frequency cutoffs and calibration anchors, reporting which paths are stable,
+  threshold-sensitive, disappearing or emerging, with four solution-similarity
+  measures. Specifications that produce no solution are recorded rather than
+  dropped.
+- `MVQCA` and `setqca.multivalue` bring multi-value QCA: categorical conditions
+  minimised as multi-value cubes, not as Boolean indicators. The dummy encoding
+  admits points where two indicators for one condition are both true, which
+  correspond to no configuration, so the cube algebra is implemented directly.
+
+#### Expressions
+
+- A typed expression system: tokenizer, recursive-descent parser, AST, canonical
+  form, simplification and evaluation, through `parse_expression`,
+  `evaluate_expression` and `simplify_expression`. Parsing is structural — there
+  is no `eval` anywhere, so an expression from a configuration file cannot
+  execute anything.
+- Simplification applies only laws valid for fuzzy sets. The complement laws are
+  deliberately **not** applied: at `A = 0.5`, `min(A, 1-A)` is not empty.
+
+#### Calibration
+
+- `CalibrationSpec` makes a calibration a serialisable value, with `direct`,
+  `crisp`, `indirect` and `identity` methods, validated when written rather than
+  when applied. `indirect_spec` expresses shapes the three-anchor form cannot.
+- `diagnose_calibration` and `diagnose_frame` report crossover pile-up,
+  compression to the extremes, low variance and never-present conditions.
+- `suggest_anchors` reports quantiles **with a caveat attached to the result**,
+  and nothing applies them automatically: a set defined by its own distribution
+  cannot support a claim about set membership.
+
+#### Truth tables and minimisation
+
+- Rows record `exclusion_reason` in words, distinguishing exclusion by the
+  frequency cutoff, by consistency and by PRI. `excluded_rows()` returns only
+  those a threshold held back.
+- Truth tables serialise to JSON and re-minimise without the original data.
+- `minimize_chart` exposes the prime-implicant chart: essential primes,
+  dominated primes, per-row explanations, and whether the tie list was
+  truncated.
+
+#### Validation
+
+- Parity fixtures generated from CRAN `QCA` 3.25 and committed, so the suite
+  runs in CI without R. Covers calibration, truth tables, fit measures,
+  necessity screening, per-term fit with unique coverage, intermediate solutions
+  with counterfactual classification, and multi-value QCA.
+- `docs/mathematical_validation.md` audits every exported quantity against its
+  definition, and `tests/test_mathematical_core.py` pins the boundary and
+  degenerate cases.
+
+### Changed
+
+- The exact cover solver was extracted as `solve_minimum_cover`, so the binary
+  and multi-value engines share one verified implementation.
+- `setqca.calibration` became a package; every existing import still works.
+- Analysis modules live under `setqca.analysis` so that a module never shadows a
+  function of the same name on the package namespace.
+- `TruthTable.to_frame()` gained an `excluded_because` column.
+- `QCAResult` gained `counterfactuals`, and `intermediate_experimental` is now
+  always `False` on fitted results, retained for compatibility.
 
 ### Documented
 
@@ -30,6 +111,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the anchors the two agree to machine precision. The divergence is bounded by
   `1e-4`, cannot change a truth-table corner assignment, and is pinned by a test
   so it cannot widen unnoticed.
+- A second divergence in multi-value conservative solutions: R writes
+  single-value literals only, so a term such as `regime[1]*wealth[1]` can be a
+  proper subset of the prime implicant `regime{1,2}*wealth{1}`. Both covers are
+  minimal and cover the same configurations, so parity is asserted on cost and
+  coverage rather than on text.
+- Guides for expressions, necessity, sufficiency diagnostics, robustness and
+  multi-value QCA.
 
 ### Removed
 
@@ -120,6 +208,8 @@ Archived on Zenodo: [10.5281/zenodo.21879360](https://doi.org/10.5281/zenodo.218
 - Parity fixtures against the reference R `QCA` implementation are not yet
   populated; the harness is present but the golden suite is a 0.2 item.
 - Multi-value and temporal QCA are out of scope for this release.
+  (Multi-value QCA arrived in 0.2.0.)
 
-[Unreleased]: https://github.com/DiogoRibeiro7/setqca-python/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/DiogoRibeiro7/setqca-python/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/DiogoRibeiro7/setqca-python/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/DiogoRibeiro7/setqca-python/releases/tag/v0.1.0

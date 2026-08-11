@@ -7,7 +7,7 @@ A native, typed Python implementation of **Qualitative Comparative Analysis
 the mathematical core of crisp-set and fuzzy-set QCA, with exact Boolean
 minimisation and data-science-friendly result objects.
 
-!!! warning "Status: 0.1.0 alpha"
+!!! warning "Status: 0.2.0 alpha"
     Conservative and parsimonious csQCA/fsQCA are the stable focus. Directional
     intermediate solutions now follow Ragin and Sonnett (2005) and match the
     reference R `QCA` implementation on the canonical Lipset datasets.

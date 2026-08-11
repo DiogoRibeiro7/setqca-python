@@ -2,8 +2,8 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "name": "setqca",
-  "description": "Native Python toolkit for crisp-set and fuzzy-set Qualitative Comparative Analysis, with exact Quine-McCluskey Boolean minimisation and typed, pandas-native results.",
-  "version": "0.1.0",
+  "description": "Native Python toolkit for crisp-set, fuzzy-set and multi-value Qualitative Comparative Analysis, with exact Quine-McCluskey Boolean minimisation, R-verified parameters of fit, and typed, pandas-native results.",
+  "version": "0.2.0",
   "license": "https://spdx.org/licenses/MIT.html",
   "codeRepository": "https://github.com/DiogoRibeiro7/setqca-python",
   "issueTracker": "https://github.com/DiogoRibeiro7/setqca-python/issues",
@@ -25,9 +25,9 @@
     "Quine-McCluskey",
     "Python"
   ],
-  "datePublished": "2026-08-10",
-  "identifier": "https://doi.org/10.5281/zenodo.21879360",
-  "sameAs": "https://doi.org/10.5281/zenodo.21879359",
+  "datePublished": "2026-08-11",
+  "identifier": "https://doi.org/10.5281/zenodo.21879359",
+  "sameAs": "https://github.com/DiogoRibeiro7/setqca-python",
   "downloadUrl": "https://pypi.org/project/setqca/",
   "author": [
     {

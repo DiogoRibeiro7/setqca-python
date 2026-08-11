@@ -1,10 +1,12 @@
 cff-version: 1.2.0
 message: "If you use setqca in your research, please cite the archived release."
 title: "setqca: Native Python Crisp-Set and Fuzzy-Set Qualitative Comparative Analysis"
-version: "0.1.0"
-date-released: 2026-08-10
+version: "0.2.0"
+date-released: 2026-08-11
 type: software
-doi: 10.5281/zenodo.21879360
+# The concept DOI always resolves to the latest archived release, so it
+# stays correct between versions; per-version DOIs are listed below.
+doi: 10.5281/zenodo.21879359
 identifiers:
   - type: doi
     value: 10.5281/zenodo.21879359
