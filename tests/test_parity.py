@@ -58,6 +58,15 @@ def _as_list(value: str | list[str]) -> list[str]:
     return list(value)
 
 
+def _as_int_list(value: int | list[int] | None) -> list[int]:
+    """Normalise a jsonlite numeric field that may have been auto-unboxed."""
+    if value is None:
+        return []
+    if isinstance(value, int):
+        return [value]
+    return list(value)
+
+
 def _parse_expression(text: str) -> SetExpression:
     """Parse R ``QCA`` notation such as ``DEV*~URB`` or ``DEV+URB``."""
     terms = text.split("+")
@@ -273,3 +282,45 @@ def test_parsimonious_solution_matches_r(analysis: dict[str, Any]) -> None:
         for solution in result.parsimonious
     }
     assert obtained == _canonical_solutions(analysis["parsimonious"])
+
+
+# ---------------------------------------------------------------------------
+# Intermediate solutions and counterfactuals
+# ---------------------------------------------------------------------------
+
+_INTERMEDIATE = FIXTURE.get("intermediate", [])
+
+
+def _fit_intermediate(case: dict[str, Any]) -> QCAResult:
+    frame = _frame(case)
+    model = FSQCA(
+        consistency=float(case["incl_cut"]),
+        directional_expectations={name: int(value) for name, value in case["expectations"].items()},
+    )
+    return model.fit(frame, outcome=case["outcome"], conditions=list(case["conditions"]))
+
+
+@pytest.mark.parametrize("case", _INTERMEDIATE, ids=_ids(_INTERMEDIATE))
+def test_intermediate_solution_matches_r(case: dict[str, Any]) -> None:
+    result = _fit_intermediate(case)
+    assert result.intermediate is not None
+    obtained = {
+        _canonical_solution(solution.expression(result.conditions).split(" + "))
+        for solution in result.intermediate
+    }
+    assert obtained == _canonical_solutions(case["intermediate"])
+
+
+@pytest.mark.parametrize("case", _INTERMEDIATE, ids=_ids(_INTERMEDIATE))
+def test_simplifying_assumptions_match_r(case: dict[str, Any]) -> None:
+    analysis = _fit_intermediate(case).counterfactuals
+    assert analysis is not None
+    assert sorted(analysis.simplifying_assumptions) == _as_int_list(case["simplifying_assumptions"])
+
+
+@pytest.mark.parametrize("case", _INTERMEDIATE, ids=_ids(_INTERMEDIATE))
+def test_easy_and_difficult_counterfactuals_match_r(case: dict[str, Any]) -> None:
+    analysis = _fit_intermediate(case).counterfactuals
+    assert analysis is not None
+    assert sorted(analysis.easy) == _as_int_list(case["easy"])
+    assert sorted(analysis.difficult) == _as_int_list(case["difficult"])

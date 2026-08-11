@@ -55,27 +55,40 @@ def test_str_reports_both_solution_families(fitted: QCAResult) -> None:
     assert "cons=1.000" in text
 
 
-def test_str_marks_the_intermediate_solution_as_experimental(
+def test_intermediate_solutions_are_no_longer_experimental(
     fuzzy_data: pd.DataFrame,
 ) -> None:
     result = FSQCA(consistency=0.8, directional_expectations={"A": "+", "B": "0"}).fit(
         fuzzy_data, outcome="Y", conditions=["A", "B"]
     )
-    assert result.intermediate_experimental is True
+    assert result.intermediate_experimental is False
     assert result.intermediate is not None
-    assert "Intermediate solution(s) [experimental]:" in str(result)
+    assert "Intermediate solution(s):" in str(result)
+    assert "experimental" not in str(result)
 
 
-def test_a_stable_intermediate_solution_would_not_carry_the_experimental_label(
-    fuzzy_data: pd.DataFrame,
-) -> None:
-    """The experimental label is driven by the flag, not by the family being present."""
-    experimental = FSQCA(consistency=0.8, directional_expectations={"A": "+"}).fit(
+def test_str_reports_the_counterfactual_split(fuzzy_data: pd.DataFrame) -> None:
+    result = FSQCA(consistency=0.8, directional_expectations={"A": "+", "B": "+"}).fit(
         fuzzy_data, outcome="Y", conditions=["A", "B"]
     )
-    stable = replace(experimental, intermediate_experimental=False)
-    assert "Intermediate solution(s):" in str(stable)
-    assert "experimental" not in str(stable)
+    assert "Counterfactuals:" in str(result)
+    assert "easy admitted" in str(result)
+
+
+def test_the_experimental_label_is_retained_for_backward_compatibility(
+    fuzzy_data: pd.DataFrame,
+) -> None:
+    """The field survives from 0.1.0 but is now always False for fitted results.
+
+    Setting it by hand still drives the rendering, so a caller reconstructing an
+    older result keeps the old output.
+    """
+    result = FSQCA(consistency=0.8, directional_expectations={"A": "+"}).fit(
+        fuzzy_data, outcome="Y", conditions=["A", "B"]
+    )
+    assert result.intermediate_experimental is False
+    legacy = replace(result, intermediate_experimental=True)
+    assert "Intermediate solution(s) [experimental]:" in str(legacy)
 
 
 def test_term_level_fits_are_reported_per_implicant(fuzzy_data: pd.DataFrame) -> None:

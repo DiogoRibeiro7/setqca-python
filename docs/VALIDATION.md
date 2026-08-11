@@ -64,7 +64,8 @@ and is reviewed as carefully as a change to the source.
 
 The canonical Lipset datasets shipped with R `QCA` are used: `LF` (fuzzy) and
 `LC` (crisp), across four analyses — two inclusion cutoffs, a crisp analysis,
-and a reduced three-condition model.
+and a reduced three-condition model. Intermediate solutions are checked
+separately across three sets of directional expectations.
 
 ## Parity status
 
@@ -78,7 +79,7 @@ Verified against **R `QCA` 3.25** under R 4.5.1:
 | 4 | Prime implicants | ✅ Covered indirectly — solutions are built from them |
 | 5 | Conservative solutions | ✅ Matches on all four analyses |
 | 6 | Parsimonious solutions | ✅ Matches on all four analyses |
-| 7 | Standard intermediate solutions | ❌ **Not implemented to standard** |
+| 7 | Standard intermediate solutions | ✅ Matches, including the easy/difficult counterfactual split |
 
 Solutions are compared as canonical sets of literal sets, so agreement is
 genuine set equality rather than string formatting agreeing by luck.
@@ -105,11 +106,15 @@ data supports. The difference is bounded by `1e-4` and cannot change a
 truth-table corner assignment. `tests/test_parity.py` pins the divergence, so if
 either implementation changes the test fails rather than drifting quietly.
 
-!!! danger "What this means for your paper"
-    Item 7 is the one to watch. The 0.1 intermediate solution is a directional
-    filter on remainders, not the standard simplifying-assumption algorithm.
-    Results from `summary_frame("intermediate")` should not be reported as
-    standard intermediate solutions.
+!!! success "Intermediate solutions reached parity"
+    Item 7 was the last outstanding gap. Intermediate solutions now follow Ragin
+    and Sonnett (2005) and reproduce R's result on the canonical Lipset data —
+    `DEV*URB*LIT*STB + DEV*LIT*~IND*STB` — along with R's classification of the
+    twelve simplifying assumptions into one easy and eleven difficult
+    counterfactuals.
+
+    Parity is verified for three different expectation sets, so the tests would
+    catch a change that happened to leave one of them unaffected.
 
 ## Reporting a divergence
 

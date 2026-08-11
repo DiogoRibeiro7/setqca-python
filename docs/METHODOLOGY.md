@@ -69,4 +69,8 @@ Conservative solutions use observed positive rows only. Parsimonious solutions a
 
 ## Intermediate solutions
 
-The v0.1 directional intermediate implementation is explicitly marked experimental. It admits only remainder rows whose complete configuration does not contradict the supplied directional expectations. Standard QCA intermediate solutions involve a richer treatment of simplifying assumptions; parity with R `QCA` is required before this feature is promoted to stable.
+Intermediate solutions follow Ragin and Sonnett (2005).
+
+A **simplifying assumption** is a remainder the parsimonious solution relies on. Such an assumption is an **easy counterfactual** when it can be reached from a configuration that was observed to be sufficient by changing conditions only in the direction the researcher expects to contribute to the outcome; every other simplifying assumption is a **difficult counterfactual**. The intermediate solution admits the easy counterfactuals as don't-cares and refuses the difficult ones, and both sets are reported on the result.
+
+A condition with no stated expectation can never justify a counterfactual leap, so differences on it make the assumption difficult.

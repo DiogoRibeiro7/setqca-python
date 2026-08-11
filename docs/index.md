@@ -9,8 +9,8 @@ minimisation and data-science-friendly result objects.
 
 !!! warning "Status: 0.1.0 alpha"
     Conservative and parsimonious csQCA/fsQCA are the stable focus. Directional
-    intermediate solutions are deliberately marked experimental until they are
-    parity-tested against the reference R `QCA` implementation.
+    intermediate solutions now follow Ragin and Sonnett (2005) and match the
+    reference R `QCA` implementation on the canonical Lipset datasets.
 
 ## Design commitments
 
@@ -19,7 +19,7 @@ minimisation and data-science-friendly result objects.
 | **Exact, not heuristic** | Minimisation is classical Quine-McCluskey with a branch-and-bound solution of the prime-implicant chart. All tied minimal covers are returned, not an arbitrary one. |
 | **Explicit, not implicit** | Every threshold is a named parameter. Ambiguous cases — such as a membership of exactly 0.5 — raise rather than being silently resolved. |
 | **Typed end to end** | The package ships `py.typed` and passes `mypy --strict`. |
-| **Honest about maturity** | Features that have not reached parity with R `QCA` are marked experimental rather than quietly approximated. |
+| **Honest about maturity** | Anything short of parity with R `QCA` is documented as such rather than quietly approximated. |
 
 ## Quick start
 

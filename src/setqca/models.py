@@ -8,6 +8,12 @@ from typing import ClassVar, Literal
 import numpy as np
 import pandas as pd
 
+from .counterfactuals import (
+    CounterfactualAnalysis,
+    DirectionalExpectation,
+    classify_counterfactuals,
+    coerce_expectations,
+)
 from .minimize.qmc import BooleanSolution, minimize
 from .results import FittedSolution, QCAResult, fit_boolean_solution
 from .truth_table import TruthTable, build_truth_table
@@ -34,15 +40,16 @@ class FSQCA:
     max_solutions : int, default 256
         Upper bound on the number of tied minimal covers returned.
     directional_expectations : dict of str to Direction, optional
-        Theoretical expectations enabling the experimental intermediate
-        solution. Empty by default, which skips intermediate minimisation.
+        Theoretical expectations enabling the intermediate solution. Empty by
+        default, which skips intermediate minimisation. Accepts the enum, the
+        QCA symbols ``"+"``/``"-"``/``"0"``, or ``1``/``0``.
 
     Notes
     -----
-    Conservative and parsimonious minimisation use an exact classical
-    Quine-McCluskey engine. The current directional intermediate solution is
-    explicitly experimental and uses only remainders that do not contradict
-    the supplied directional expectations.
+    All three solution families use an exact classical Quine-McCluskey engine.
+    Intermediate solutions follow Ragin and Sonnett (2005): the parsimonious
+    solution's simplifying assumptions are split into easy and difficult
+    counterfactuals, and only the easy ones are admitted.
     """
 
     consistency: float = 0.8
@@ -103,11 +110,12 @@ class FSQCA:
         if self.max_solutions < 1:
             raise ValueError("max_solutions must be at least 1.")
         for condition, direction in self.directional_expectations.items():
-            if direction not in ("+", "-", "0"):
+            try:
+                DirectionalExpectation.coerce(direction)
+            except ValueError as error:
                 raise ValueError(
-                    f"Directional expectation for {condition!r} must be '+', '-' or '0'; "
-                    f"got {direction!r}."
-                )
+                    f"Directional expectation for {condition!r} is invalid. {error}"
+                ) from error
 
     def _fit_from_truth_table(self, data: pd.DataFrame, truth_table: TruthTable) -> QCAResult:
         on_set = truth_table.positive_minterms
@@ -122,10 +130,15 @@ class FSQCA:
             max_solutions=self.max_solutions,
         )
         intermediate_raw: tuple[BooleanSolution, ...] | None = None
+        counterfactuals: CounterfactualAnalysis | None = None
         if self.directional_expectations:
+            expectations = coerce_expectations(
+                self.directional_expectations, truth_table.conditions
+            )
+            counterfactuals = classify_counterfactuals(truth_table, parsimonious_raw, expectations)
             intermediate_raw = minimize(
                 on_set,
-                dont_cares=self._directionally_allowed_remainders(truth_table),
+                dont_cares=set(counterfactuals.admitted),
                 width=width,
                 max_solutions=self.max_solutions,
             )
@@ -149,27 +162,9 @@ class FSQCA:
             conservative=fitted(conservative_raw),
             parsimonious=fitted(parsimonious_raw),
             intermediate=None if intermediate_raw is None else fitted(intermediate_raw),
-            intermediate_experimental=intermediate_raw is not None,
+            intermediate_experimental=False,
+            counterfactuals=counterfactuals,
         )
-
-    def _directionally_allowed_remainders(self, truth_table: TruthTable) -> set[int]:
-        """Return remainders consistent with every directional expectation."""
-        for condition in self.directional_expectations:
-            if condition not in truth_table.conditions:
-                raise KeyError(
-                    f"Directional expectation references unknown condition {condition!r}."
-                )
-        expectations = [
-            (truth_table.conditions.index(condition), 1 if direction == "+" else 0)
-            for condition, direction in self.directional_expectations.items()
-            if direction != "0"
-        ]
-        return {
-            row.minterm
-            for row in truth_table.rows
-            if row.outcome == "R"
-            and all(row.configuration[index] == state for index, state in expectations)
-        }
 
 
 @dataclass(slots=True)

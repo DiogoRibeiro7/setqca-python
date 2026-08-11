@@ -9,7 +9,7 @@
 - complete binary truth tables
 - exact classical QMC
 - conservative and parsimonious csQCA/fsQCA solutions
-- experimental directional intermediate solution
+- directional intermediate solutions
 - pandas-native result objects
 - parity harness against R `QCA`
 

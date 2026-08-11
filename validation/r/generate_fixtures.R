@@ -140,6 +140,64 @@ analyses <- list(
 )
 
 # ---------------------------------------------------------------------------
+# Intermediate solutions
+# ---------------------------------------------------------------------------
+
+# R keeps the intermediate solution in $i.sol, not $solution: $solution stays
+# the parsimonious result even when dir.exp is supplied.
+minterms_of <- function(frame, conditions) {
+  if (is.null(frame) || nrow(frame) == 0) {
+    return(integer(0))
+  }
+  sort(apply(frame[, conditions, drop = FALSE], 1, function(row) {
+    sum(as.integer(row) * 2^rev(seq_along(row) - 1))
+  }))
+}
+
+build_intermediate <- function(id, dataset_name, outcome, conditions, incl_cut, expectations) {
+  data(list = dataset_name, package = "QCA", envir = environment())
+  frame <- get(dataset_name, envir = environment())
+  frame <- frame[, c(conditions, outcome), drop = FALSE]
+  tt <- truthTable(frame, outcome = outcome, conditions = conditions, incl.cut = incl_cut)
+
+  model <- minimize(tt, include = "?", dir.exp = expectations, details = TRUE)
+  branch <- model$i.sol[[1]]
+
+  list(
+    id = id,
+    dataset = dataset_name,
+    outcome = outcome,
+    conditions = conditions,
+    incl_cut = incl_cut,
+    expectations = as.list(expectations),
+    data = as.list(frame),
+    case_ids = rownames(frame),
+    intermediate = lapply(branch$solution, as.character),
+    easy = as.integer(minterms_of(branch$EC, conditions)),
+    difficult = as.integer(minterms_of(branch$DC, conditions)),
+    simplifying_assumptions = as.integer(minterms_of(model$SA[[1]], conditions))
+  )
+}
+
+intermediate_cases <- list(
+  build_intermediate(
+    "LF-SURV-all-present", "LF", "SURV",
+    c("DEV", "URB", "LIT", "IND", "STB"), 0.8,
+    c(DEV = 1, URB = 1, LIT = 1, IND = 1, STB = 1)
+  ),
+  build_intermediate(
+    "LF-SURV-ind-absent", "LF", "SURV",
+    c("DEV", "URB", "LIT", "IND", "STB"), 0.8,
+    c(DEV = 1, URB = 1, LIT = 1, IND = 0, STB = 1)
+  ),
+  build_intermediate(
+    "LF-SURV-three", "LF", "SURV",
+    c("DEV", "LIT", "STB"), 0.8,
+    c(DEV = 1, LIT = 1, STB = 1)
+  )
+)
+
+# ---------------------------------------------------------------------------
 # Parameters of fit
 # ---------------------------------------------------------------------------
 
@@ -227,7 +285,8 @@ fixture <- list(
   ),
   calibration = calibration_cases,
   pof = pof_cases,
-  analyses = analyses
+  analyses = analyses,
+  intermediate = intermediate_cases
 )
 
 dir.create(dirname(out_path), recursive = TRUE, showWarnings = FALSE)
@@ -236,3 +295,4 @@ cat("wrote", out_path, "\n")
 cat("  calibration cases:", length(calibration_cases), "\n")
 cat("  pof cases:        ", length(pof_cases), "\n")
 cat("  analyses:         ", length(analyses), "\n")
+cat("  intermediate:     ", length(intermediate_cases), "\n")

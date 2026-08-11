@@ -97,7 +97,7 @@ of the Python data stack.
 | --- | --- | --- |
 | `conservative` | none | Makes no assumptions about unobserved configurations. The most defensible, least parsimonious. |
 | `parsimonious` | all | Uses every logical remainder as a don't-care. The simplest expression, but rests on untested simplifying assumptions. |
-| `intermediate` | those consistent with theory | **Experimental.** Only remainders that do not contradict your directional expectations. |
+| `intermediate` | easy counterfactuals only | Remainders reachable from an observed sufficient configuration by changing conditions only in the expected direction. |
 
 ```python
 model = FSQCA(
@@ -108,11 +108,24 @@ result = model.fit(data, outcome="innovation", conditions=["digital", "skills"])
 print(result.summary_frame("intermediate"))
 ```
 
-!!! warning "Intermediate solutions are experimental"
-    The 0.1 implementation admits only remainders whose configuration does not
-    contradict the supplied expectations. Standard QCA intermediate solutions
-    involve a richer treatment of simplifying assumptions. Do not report these
-    results as standard intermediate solutions until parity is established.
+The result reports which counterfactuals were admitted and which were refused:
+
+```python
+print(result.counterfactuals)
+```
+
+```text
+Expectations: digital+, skills+
+Simplifying assumptions: 2
+  easy (admitted):   [1]
+  difficult (refused): [2]
+```
+
+!!! note "Difficult counterfactuals are refused, not hidden"
+    A difficult counterfactual is a remainder whose use would require assuming
+    the outcome survives a change running against your own theory. Those are
+    listed rather than silently used, so a reader can see exactly which
+    assumptions the intermediate solution rests on.
 
 ## Crisp-set analysis
 

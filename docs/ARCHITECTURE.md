@@ -29,7 +29,7 @@ minimize/qmc.py
 models.py
   conservative
   parsimonious
-  experimental intermediate
+  intermediate
       |
       v
 results.py

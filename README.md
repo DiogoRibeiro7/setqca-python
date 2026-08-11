@@ -15,9 +15,9 @@ A native, typed Python implementation of **Qualitative Comparative Analysis (QCA
 the mathematical core of crisp-set and fuzzy-set QCA, with exact Boolean
 minimisation and data-science-friendly result objects.
 
-> **Status: 0.1.0 alpha.** Conservative and parsimonious csQCA/fsQCA are the
-> stable focus. Directional intermediate solutions are deliberately marked
-> experimental until parity-tested against the reference R `QCA` implementation.
+> **Status: 0.1.0 alpha.** Conservative, parsimonious and intermediate
+> csQCA/fsQCA all match the reference R `QCA` implementation on the canonical
+> Lipset datasets. See the validation page for the one documented divergence.
 
 📖 **[Documentation](https://diogoribeiro7.github.io/setqca-python/)** ·
 🚀 **[Getting started](https://diogoribeiro7.github.io/setqca-python/getting-started/)** ·
@@ -38,7 +38,7 @@ Four commitments shape the design:
 | **Exact, not heuristic** | Classical Quine-McCluskey with branch-and-bound solution of the prime-implicant chart. All tied minimal covers are returned, not an arbitrary one. |
 | **Explicit, not implicit** | Every threshold is a named parameter. Ambiguous input — a membership of exactly 0.5, an uncalibrated column — raises instead of being silently resolved. |
 | **Typed end to end** | Ships `py.typed`; passes `mypy --strict`; 100% test coverage enforced in CI. |
-| **Honest about maturity** | Features short of parity with R `QCA` are marked experimental rather than quietly approximated. |
+| **Honest about maturity** | Anything short of parity with R `QCA` is documented as such rather than quietly approximated. |
 
 ## Features
 
@@ -57,7 +57,7 @@ Four commitments shape the design:
 - exact branch-and-bound solution of the prime-implicant chart
 - conservative solutions
 - parsimonious solutions
-- experimental directional intermediate solutions
+- intermediate solutions with easy/difficult counterfactual reporting
 - tidy pandas exports
 - optional parity harness against R `QCA`
 
@@ -184,7 +184,7 @@ Verified against **R `QCA` 3.25** on the canonical Lipset datasets:
 | Sufficiency and necessity fit, incl. PRI and RoN | ✅ |
 | Conservative solutions | ✅ |
 | Parsimonious solutions | ✅ |
-| Standard intermediate solutions | ❌ not implemented to standard |
+| Intermediate solutions, easy/difficult counterfactuals | ✅ |
 
 Correctness rests on five layers: unit tests against known results, brute-force
 exactness tests of the minimiser, property-based invariant tests, error-contract
@@ -199,8 +199,7 @@ contract.
 - claiming complete parity with R `QCA`;
 - mvQCA;
 - tQCA;
-- CCubes/eQMC performance parity;
-- stable standard intermediate solutions.
+- CCubes/eQMC performance parity.
 
 These are roadmap items rather than hidden approximations. See
 [`docs/ROADMAP.md`](docs/ROADMAP.md).
