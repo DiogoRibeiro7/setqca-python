@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `MinimizationComplexityWarning`, raised by `minimize` once the primes are
+  known but before the exponential cover search begins, so a run that will take
+  a long time says so rather than appearing to hang. The run still completes and
+  the answer is still exact; silence it with `warnings.simplefilter` or disable
+  it with `minimize(..., complexity_guard=False)`. The threshold is the prime
+  count, chosen from measurement rather than intuition.
+- `benchmarks/profile_phases.py`, which times truth-table construction, prime
+  generation, chart construction and cover solving separately across cases,
+  conditions, sufficient share and remainder share. Remainder-heavy problems are
+  dominated by prime generation; dense on-sets by the cover search.
+- `build_chart` accepts pre-computed `primes`, so callers that already generated
+  them do not pay for it twice.
+
+### Changed
+
+- Prime generation now works on integer bitmasks rather than tuples of optional
+  bits: **141× faster** at eight conditions (1.41 s to 0.010 s), 83× end to end.
+  The algorithm is unchanged and every exactness and R-parity test passes
+  unchanged. A ten-condition parsimonious solution now takes 0.45 s rather than
+  roughly 36 s.
+
 ## [0.2.0] — 2026-08-11
 
 Archived on Zenodo: [10.5281/zenodo.21887472](https://doi.org/10.5281/zenodo.21887472)

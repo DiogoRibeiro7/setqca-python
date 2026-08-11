@@ -239,8 +239,9 @@ def build_chart(
     *,
     dont_cares: set[int] | None = None,
     width: int,
+    primes: tuple[Implicant, ...] | None = None,
 ) -> PrimeImplicantChart:
-    """Generate the prime implicants and assemble the chart.
+    """Assemble the chart, generating the prime implicants if not supplied.
 
     Parameters
     ----------
@@ -250,6 +251,10 @@ def build_chart(
         Logical remainders, usable but not required.
     width : int
         Number of conditions.
+    primes : tuple of Implicant, optional
+        Pre-generated primes. Supply these when they are already available:
+        generation dominates the runtime on remainder-heavy problems, so
+        repeating it doubles the cost of building a chart.
 
     Returns
     -------
@@ -257,7 +262,8 @@ def build_chart(
         The chart, whose primes are ordered by literal count then bit pattern.
     """
     required = set(on_set)
-    primes = prime_implicants(required, set() if dont_cares is None else set(dont_cares), width)
+    if primes is None:
+        primes = prime_implicants(required, set() if dont_cares is None else set(dont_cares), width)
     entries = tuple(
         PrimeImplicant(
             index=index,
@@ -302,7 +308,10 @@ def minimize_chart(
     RuntimeError
         If some configuration is covered by no prime implicant.
     """
-    chart = build_chart(on_set, dont_cares=dont_cares, width=width)
+    generated = prime_implicants(
+        set(on_set), set() if dont_cares is None else set(dont_cares), width
+    )
+    chart = build_chart(on_set, dont_cares=dont_cares, width=width, primes=generated)
     solutions = exact_minimum_covers(
         tuple(prime.implicant for prime in chart.primes),
         set(on_set),
