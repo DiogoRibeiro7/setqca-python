@@ -43,7 +43,7 @@ run over all cases.
 | Minimal cover | exact branch and bound | `minimize.exact_minimum_covers` | `test_qmc_exactness`, `test_qmc_reductions` | exact | ✅ Verified |
 | Conservative solution | on-set only, no remainders | `models.FSQCA` | parity | exact | ✅ Verified |
 | Parsimonious solution | remainders as don't-cares | `models.FSQCA` | parity | exact | ✅ Verified |
-| Intermediate solution | directional filter on remainders | `models.FSQCA` | `test_results` | — | ⚠️ Experimental |
+| Intermediate solution | Ragin-Sonnett easy counterfactuals | `counterfactuals`, `models.FSQCA` | `test_counterfactuals`, parity | exact | ✅ Verified |
 
 ## Definitions in full
 
@@ -113,9 +113,9 @@ poison downstream aggregation.
    per-term unique coverage reported by other QCA software is not. Solutions
    currently expose overall and per-term fit through `FittedSolution.term_fits`,
    which is raw coverage per term. This is a gap, not a divergence.
-2. **Intermediate solutions are not the standard algorithm.** They filter
-   remainders against directional expectations rather than deriving simplifying
-   assumptions, and remain marked experimental.
+2. **Intermediate solutions now follow the standard algorithm.** Simplifying
+   assumptions are derived from the parsimonious solution and split into easy
+   and difficult counterfactuals, matching R `QCA` on the Lipset data.
 3. **No untested mathematical helper remains.** Every function in `metrics.py`,
    `sets.py`, `calibration.py` and `minimize/` is reached by the suite, which
    runs at 100% line and branch coverage.
