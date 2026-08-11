@@ -16,9 +16,23 @@ from .necessity import (
     NecessityCandidate,
     necessity_analysis,
 )
+from .sufficiency import (
+    CaseDiagnostic,
+    CaseRole,
+    SolutionDiagnostics,
+    TermDiagnostics,
+    classify_case,
+    sufficiency_diagnostics,
+)
 
 __all__ = [
+    "CaseDiagnostic",
+    "CaseRole",
     "NecessityAnalysis",
     "NecessityCandidate",
+    "SolutionDiagnostics",
+    "TermDiagnostics",
+    "classify_case",
     "necessity_analysis",
+    "sufficiency_diagnostics",
 ]
