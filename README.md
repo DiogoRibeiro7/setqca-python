@@ -197,7 +197,6 @@ contract.
 ## Non-goals for 0.1
 
 - claiming complete parity with R `QCA`;
-- mvQCA;
 - tQCA;
 - CCubes/eQMC performance parity.
 

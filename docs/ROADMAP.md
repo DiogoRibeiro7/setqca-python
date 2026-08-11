@@ -27,10 +27,8 @@
 - optional R-compatible calibration snapping, so extreme memberships can be
   reported exactly as R does when replicating an existing analysis
 
-## 0.3 — multi-value and performance
+## 0.3 — performance
 
-- mvQCA
-- categorical-set expressions
 - faster bitset/cube minimiser
 - prime-implicant consistency filters
 - row dominance

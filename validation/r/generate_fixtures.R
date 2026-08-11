@@ -353,6 +353,61 @@ calibration_cases <- list(
 )
 
 # ---------------------------------------------------------------------------
+# Multi-value QCA
+# ---------------------------------------------------------------------------
+
+# R writes multi-value literals as `regime[2]`; setqca writes `regime{2}` and
+# additionally forms subset literals such as `regime{1,2}`, which R does not.
+# The truth table and the parsimonious solution are directly comparable.
+build_multivalue <- function(id, frame, outcome, conditions, incl_cut) {
+  tt <- truthTable(frame,
+    outcome = outcome, conditions = conditions,
+    incl.cut = incl_cut, show.cases = TRUE
+  )
+  rows <- lapply(seq_len(nrow(tt$tt)), function(i) {
+    row <- tt$tt[i, ]
+    incl <- suppressWarnings(as.numeric(as.character(row[["incl"]])))
+    list(
+      configuration = as.integer(unlist(row[conditions])),
+      n = as.integer(row[["n"]]),
+      consistency = if (is.na(incl)) NULL else incl,
+      out = recode_out(row[["OUT"]])
+    )
+  })
+  list(
+    id = id,
+    outcome = outcome,
+    conditions = conditions,
+    incl_cut = incl_cut,
+    data = as.list(frame),
+    truth_table = rows,
+    conservative = safe_minimize(tt, include = ""),
+    parsimonious = safe_minimize(tt, include = "?")
+  )
+}
+
+multivalue_cases <- list(
+  build_multivalue(
+    "regime-wealth",
+    data.frame(
+      regime = c(0, 0, 1, 1, 2, 2, 1, 2),
+      wealth = c(0, 0, 1, 1, 1, 1, 0, 0),
+      Y = c(0, 0, 1, 1, 1, 1, 0, 1)
+    ),
+    "Y", c("regime", "wealth"), 0.8
+  ),
+  build_multivalue(
+    "three-by-three",
+    data.frame(
+      A = c(0, 1, 2, 0, 1, 2, 0, 1, 2),
+      B = c(0, 0, 0, 1, 1, 1, 2, 2, 2),
+      Y = c(0, 0, 1, 0, 1, 1, 1, 1, 1)
+    ),
+    "Y", c("A", "B"), 0.8
+  )
+)
+
+# ---------------------------------------------------------------------------
 # Emit
 # ---------------------------------------------------------------------------
 
@@ -374,7 +429,8 @@ fixture <- list(
   pof = pof_cases,
   analyses = analyses,
   intermediate = intermediate_cases,
-  necessity_screens = necessity_screens
+  necessity_screens = necessity_screens,
+  multivalue = multivalue_cases
 )
 
 dir.create(dirname(out_path), recursive = TRUE, showWarnings = FALSE)

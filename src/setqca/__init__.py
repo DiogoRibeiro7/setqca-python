@@ -65,6 +65,7 @@ from .minimize import (
     minimize_chart,
 )
 from .models import CSQCA, FSQCA, Direction
+from .multivalue import MVQCA, MultiValueDomain, MultiValueResult, MultiValueTruthTable
 from .results import FittedSolution, QCAResult
 from .sets import Condition, Intersection, Negation, SetExpression, Union
 from .truth_table import TruthCode, TruthTable, TruthTableRow, build_truth_table
@@ -77,6 +78,7 @@ except PackageNotFoundError:  # pragma: no cover - source checkout without insta
 __all__ = [
     "CSQCA",
     "FSQCA",
+    "MVQCA",
     "AnchorSuggestion",
     "BooleanSolution",
     "CalibrationDiagnostics",
@@ -98,6 +100,9 @@ __all__ = [
     "Intersection",
     "MinimalCover",
     "MinimizationResult",
+    "MultiValueDomain",
+    "MultiValueResult",
+    "MultiValueTruthTable",
     "NecessityAnalysis",
     "NecessityCandidate",
     "NecessityFit",
