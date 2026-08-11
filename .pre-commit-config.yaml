@@ -27,6 +27,11 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+        # ruff 0.16 formats python blocks inside Markdown, but the hook's
+        # default file types are Python only. Without this, CI runs the
+        # formatter over documentation that pre-commit never saw, and a clean
+        # local commit fails the build.
+        types_or: [python, pyi, jupyter, markdown]
 
   - repo: https://github.com/python-poetry/poetry
     rev: 2.2.1
