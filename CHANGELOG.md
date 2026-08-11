@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] — 2026-08-11
 
+Archived on Zenodo: [10.5281/zenodo.21887472](https://doi.org/10.5281/zenodo.21887472)
+(concept DOI [10.5281/zenodo.21879359](https://doi.org/10.5281/zenodo.21879359)).
+
 Every component now matches the reference R `QCA` implementation on the
 canonical datasets, including intermediate solutions, which 0.1.0 computed
 incorrectly. Multi-value QCA, necessity screening, robustness sweeps and
