@@ -44,6 +44,7 @@ nav:
       - Calibration: guide/calibration.md
       - Expressions: guide/expressions.md
       - Necessity: guide/necessity.md
+      - Sufficiency diagnostics: guide/sufficiency-diagnostics.md
       - Truth tables: guide/truth-tables.md
       - Minimisation: guide/minimisation.md
   - Methodology: METHODOLOGY.md
