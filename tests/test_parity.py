@@ -31,6 +31,7 @@ from setqca import (
     necessity,
     necessity_analysis,
     sufficiency,
+    sufficiency_diagnostics,
 )
 
 pytestmark = pytest.mark.parity
@@ -54,6 +55,15 @@ def _ids(records: list[dict[str, Any]]) -> list[str]:
 
 def _as_list(value: str | list[str]) -> list[str]:
     """Normalise a jsonlite value that may have been auto-unboxed to a scalar."""
+    if isinstance(value, str):
+        return [value]
+    return list(value)
+
+
+def _as_str_list(value: str | list[str] | None) -> list[str]:
+    """Normalise a jsonlite string field that may have been auto-unboxed."""
+    if value is None:
+        return []
     if isinstance(value, str):
         return [value]
     return list(value)
@@ -283,6 +293,69 @@ def test_parsimonious_solution_matches_r(analysis: dict[str, Any]) -> None:
         for solution in result.parsimonious
     }
     assert obtained == _canonical_solutions(analysis["parsimonious"])
+
+
+# ---------------------------------------------------------------------------
+# Per-term fit, including unique coverage
+# ---------------------------------------------------------------------------
+
+_TERM_FITS = [
+    (analysis, record)
+    for analysis in FIXTURE["analyses"]
+    for record in analysis.get("term_fits", [])
+]
+
+
+@pytest.mark.parametrize(
+    ("analysis", "record"),
+    _TERM_FITS,
+    ids=[f"{a['id']}-{r['family']}-{r['term']}" for a, r in _TERM_FITS],
+)
+def test_term_fit_matches_r(analysis: dict[str, Any], record: dict[str, Any]) -> None:
+    """Per-term consistency, PRI, raw coverage and unique coverage."""
+    frame = _frame(analysis)
+    family_terms = [
+        item["term"] for item in analysis["term_fits"] if item["family"] == record["family"]
+    ]
+    diagnostics = sufficiency_diagnostics(frame, outcome=analysis["outcome"], terms=family_terms)
+    term = next(item for item in diagnostics.terms if item.expression == record["term"])
+
+    assert term.fit.consistency == pytest.approx(record["consistency"], abs=TOLERANCE)
+    assert term.fit.pri == pytest.approx(record["pri"], abs=TOLERANCE)
+    assert term.fit.coverage == pytest.approx(record["raw_coverage"], abs=TOLERANCE)
+
+    if record.get("unique_coverage") is None:
+        # R leaves covU undefined for a one-term solution. setqca reports the
+        # raw coverage instead: with nothing to share with, everything the term
+        # covers is uniquely covered by it.
+        assert len(family_terms) == 1
+        assert term.unique_coverage == pytest.approx(term.fit.coverage)
+    else:
+        assert term.unique_coverage == pytest.approx(record["unique_coverage"], abs=TOLERANCE)
+
+
+@pytest.mark.parametrize(
+    ("analysis", "record"),
+    _TERM_FITS,
+    ids=[f"{a['id']}-{r['family']}-{r['term']}" for a, r in _TERM_FITS],
+)
+def test_cases_in_a_term_match_r(analysis: dict[str, Any], record: dict[str, Any]) -> None:
+    """R's ``cases`` column lists membership in the term, above the crossover.
+
+    The case typology splits those further into typical and deviant-in-degree,
+    so the union of those two roles is what corresponds to R's list.
+    """
+    frame = _frame(analysis)
+    family_terms = [
+        item["term"] for item in analysis["term_fits"] if item["family"] == record["family"]
+    ]
+    diagnostics = sufficiency_diagnostics(frame, outcome=analysis["outcome"], terms=family_terms)
+    term = next(item for item in diagnostics.terms if item.expression == record["term"])
+
+    in_term = {item.case for item in term.cases if item.term_membership > 0.5}
+    assert in_term == set(_as_str_list(record["cases"]))
+    assert term.frequency == len(in_term)
+    assert set(term.typical) <= in_term
 
 
 # ---------------------------------------------------------------------------

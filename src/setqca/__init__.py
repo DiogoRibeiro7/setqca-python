@@ -9,7 +9,16 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
-from .analysis import NecessityAnalysis, NecessityCandidate, necessity_analysis
+from .analysis import (
+    CaseDiagnostic,
+    CaseRole,
+    NecessityAnalysis,
+    NecessityCandidate,
+    SolutionDiagnostics,
+    TermDiagnostics,
+    necessity_analysis,
+    sufficiency_diagnostics,
+)
 from .calibration import DirectCalibration, calibrate_crisp, calibrate_direct
 from .counterfactuals import (
     CounterfactualAnalysis,
@@ -50,6 +59,8 @@ __all__ = [
     "CSQCA",
     "FSQCA",
     "BooleanSolution",
+    "CaseDiagnostic",
+    "CaseRole",
     "Condition",
     "Configuration",
     "CounterfactualAnalysis",
@@ -71,7 +82,9 @@ __all__ = [
     "PrimeImplicantChart",
     "QCAResult",
     "SetExpression",
+    "SolutionDiagnostics",
     "SufficiencyFit",
+    "TermDiagnostics",
     "TruthCode",
     "TruthTable",
     "TruthTableRow",
@@ -90,4 +103,5 @@ __all__ = [
     "parse_expression",
     "simplify_expression",
     "sufficiency",
+    "sufficiency_diagnostics",
 ]

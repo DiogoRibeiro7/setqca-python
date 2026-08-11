@@ -33,7 +33,8 @@ run over all cases.
 | Necessity consistency | `Σ min(X,Y) / Σ Y` | `metrics.necessity` | `TestNecessity` | `1e-9` vs R | ✅ Verified |
 | Necessity coverage | `Σ min(X,Y) / Σ X` | `metrics.necessity` | `TestNecessity` | `1e-9` vs R | ✅ Verified |
 | Relevance of necessity | `Σ (1−X) / Σ (1 − min(X,Y))` | `metrics.necessity` | `TestNecessity` | `1e-9` vs R | ✅ Verified |
-| Unique coverage | `cov(Tᵢ) − cov(⋃ⱼ≠ᵢ Tⱼ)` | — | — | — | ❌ Not implemented |
+| Unique coverage | `[Σ min(Xᵢ,Y) − Σ min(Xᵢ, max_{j≠i} Xⱼ, Y)] / Σ Y` | `analysis.sufficiency` | `test_sufficiency_diagnostics`, parity | `1e-9` vs R | ✅ Verified |
+| Case typology | crossover comparison of `X` and `Y` | `analysis.sufficiency` | `test_sufficiency_diagnostics` | exact | ✅ Tested |
 | Trivial necessity | `RoN` below threshold with high consistency | `analysis.necessity` | `test_necessity`, parity | `1e-9` vs R | ✅ Verified |
 | SUIN disjunction | `consistency(A+B) ≥ max over parts` | `analysis.necessity` | `test_necessity` | `1e-12` | ✅ Tested |
 | Direct calibration, logistic | see below | `calibration.DirectCalibration` | `TestCalibration`, parity | `1e-9` vs R | ✅ Verified |
@@ -111,10 +112,10 @@ poison downstream aggregation.
 
 ## Findings
 
-1. **Unique coverage is absent.** Raw coverage is implemented and verified; the
-   per-term unique coverage reported by other QCA software is not. Solutions
-   currently expose overall and per-term fit through `FittedSolution.term_fits`,
-   which is raw coverage per term. This is a gap, not a divergence.
+1. **Unique coverage is implemented and verified**, closing the gap this audit
+   first recorded. It matches R's `covU` for every multi-term solution on the
+   Lipset data. R leaves `covU` undefined for a one-term solution; setqca
+   reports the raw coverage there, since there is no other term to share with.
 2. **Intermediate solutions now follow the standard algorithm.** Simplifying
    assumptions are derived from the parsimonious solution and split into easy
    and difficult counterfactuals, matching R `QCA` on the Lipset data.
