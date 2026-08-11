@@ -93,10 +93,10 @@ Four scales are available:
 from setqca.analysis.robustness import solution_similarity
 
 similarity = solution_similarity(left_terms, right_terms, data)
-similarity.identical        # exact set equality
-similarity.term_overlap     # Jaccard over terms
+similarity.identical  # exact set equality
+similarity.term_overlap  # Jaccard over terms
 similarity.configurational  # Jaccard over the literals used
-similarity.membership       # fuzzy Jaccard over case membership
+similarity.membership  # fuzzy Jaccard over case membership
 ```
 
 The last is the one that catches agreement the text hides: two solutions can be
