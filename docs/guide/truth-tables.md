@@ -87,11 +87,11 @@ recorded. A row's outcome code alone conflates situations that call for
 different responses:
 
 ```python
-table.positive_rows()   # coded "1"
-table.negative_rows()   # coded "0"
+table.positive_rows()  # coded "1"
+table.negative_rows()  # coded "0"
 table.contradictions()  # coded "C"
-table.remainders()      # coded "R"
-table.excluded_rows()   # kept out by a *threshold*, not by the evidence
+table.remainders()  # coded "R"
+table.excluded_rows()  # kept out by a *threshold*, not by the evidence
 print(table.summary())
 ```
 
@@ -124,8 +124,8 @@ stored and re-minimised without recalibrating or rebuilding:
 text = table.to_json()
 restored = TruthTable.from_json(text)
 
-restored.minimize()                            # conservative
-restored.minimize(include_remainders=True)     # parsimonious
+restored.minimize()  # conservative
+restored.minimize(include_remainders=True)  # parsimonious
 ```
 
 Both agree with the estimator exactly — there are tests asserting so. Only the

@@ -47,6 +47,7 @@ nav:
       - Sufficiency diagnostics: guide/sufficiency-diagnostics.md
       - Truth tables: guide/truth-tables.md
       - Minimisation: guide/minimisation.md
+      - Multi-value QCA: guide/multivalue.md
       - Robustness: guide/robustness.md
   - Methodology: METHODOLOGY.md
   - Architecture: ARCHITECTURE.md
