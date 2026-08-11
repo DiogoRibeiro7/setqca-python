@@ -107,6 +107,106 @@ build_truth_table(data, outcome="Y", conditions=["A"], allow_crossover_cases=Tru
 With the override, scores of exactly 0.5 are assigned to the *present* corner,
 because corner assignment uses `x >= 0.5`.
 
+## Specifications
+
+A calibration is a decision worth recording. `CalibrationSpec` makes it a value
+you can store, compare, ship in a replication package, and replay:
+
+```python
+from setqca import calibrate, direct_spec
+
+spec = direct_spec(
+    "innovation",
+    full_out=20,
+    crossover=50,
+    full_in=80,
+    note="OECD reporting threshold; see section 3.2",
+)
+result = calibrate(raw["innovation"], spec)
+
+result.values  # the calibrated memberships
+result.spec  # what produced them
+result.diagnostics  # and what is worrying about them
+```
+
+The `note` carries the *reason* through serialisation, because the reason is
+part of the specification:
+
+```python
+spec.to_json()
+CalibrationSpec.from_json(text)  # round-trips exactly
+```
+
+A specification is validated when it is written, not when it eventually meets
+data — badly ordered anchors raise immediately.
+
+### Indirect calibration
+
+When theory dictates a shape the three-anchor transformation cannot express — a
+plateau, a step, an asymmetric ramp — give the mapping explicitly:
+
+```python
+from setqca import indirect_spec
+
+spec = indirect_spec(
+    "capacity",
+    mapping=((0, 0.0), (30, 0.5), (70, 0.5), (100, 1.0)),
+    note="no meaningful variation between 30 and 70",
+)
+```
+
+Points are interpolated linearly and held flat beyond the ends. The mapping must
+be non-decreasing, since a calibration that reverses direction is a different
+concept, not a calibration.
+
+## Diagnostics
+
+A calibration can be arithmetically valid and analytically useless.
+
+```python
+from setqca import diagnose_calibration, diagnose_frame
+
+print(diagnose_calibration(calibrated))
+diagnose_frame(data)  # one row per condition
+```
+
+Five failures are reported:
+
+| Warning | Why it matters |
+| --- | --- |
+| Cases exactly at 0.5 | The truth-table corner is undefined. This is the only one that makes the vector *unusable*. |
+| Pile-up near the crossover | Small anchor changes will move cases between corners, so the result is fragile. |
+| Compression to the extremes | The calibration is effectively crisp; the fuzzy detail has been squeezed out. |
+| Low variance | The condition barely varies and carries little information. |
+| Never present / never absent | Every case falls on one side, so the condition cannot discriminate. |
+
+None is fatal by itself — they are reported so you can decide, not enforced.
+
+## Quantile helpers, and why they are not a calibration
+
+```python
+from setqca import suggest_anchors
+
+print(suggest_anchors(raw["innovation"]))
+```
+
+```text
+Suggested from quantiles (0.05, 0.5, 0.95): full_out=12, crossover=48, full_in=91
+  Quantiles describe the sample, not the concept. Anchors must be justified
+  substantively; these are a starting point for that argument, not a substitute
+  for it.
+```
+
+!!! danger "Data-driven anchors are not calibration"
+    A set defined by its own distribution cannot support a claim about set
+    membership. If the crossover is the sample median, then "more in than out"
+    means "above average for these cases" — which changes when you add a case,
+    and says nothing about the concept.
+
+    The helper exists to show you where your cases actually lie so you can
+    argue for anchors. It returns the caveat attached to the result, and
+    nothing in this package will apply quantile anchors for you.
+
 ## Reusing a calibration
 
 `DirectCalibration` is a frozen dataclass, so a calibration is a value you can
