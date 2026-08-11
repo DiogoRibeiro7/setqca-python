@@ -373,6 +373,44 @@
       ],
       "parsimonious": [
         ["DEV*~IND", "URB*STB"]
+      ],
+      "term_fits": [
+        {
+          "family": "conservative",
+          "term": "DEV*URB*LIT*IND*STB",
+          "consistency": 0.9042056074766355,
+          "pri": 0.8857938718662952,
+          "raw_coverage": 0.454225352112676,
+          "unique_coverage": 0.3931924882629108,
+          "cases": ["BE", "CZ", "NL", "UK"]
+        },
+        {
+          "family": "conservative",
+          "term": "DEV*~URB*LIT*~IND*STB",
+          "consistency": 0.8042704626334523,
+          "pri": 0.7193877551020412,
+          "raw_coverage": 0.2652582159624414,
+          "unique_coverage": 0.2042253521126761,
+          "cases": ["FI", "IE"]
+        },
+        {
+          "family": "parsimonious",
+          "term": "DEV*~IND",
+          "consistency": 0.8148148148148149,
+          "pri": 0.7208121827411167,
+          "raw_coverage": 0.2840375586854459,
+          "unique_coverage": 0.1936619718309858,
+          "cases": ["FI", "IE"]
+        },
+        {
+          "family": "parsimonious",
+          "term": "URB*STB",
+          "consistency": 0.8737672583826429,
+          "pri": 0.8454106280193235,
+          "raw_coverage": 0.5199530516431925,
+          "unique_coverage": 0.4295774647887324,
+          "cases": ["BE", "CZ", "NL", "UK"]
+        }
       ]
     },
     {
@@ -654,6 +692,26 @@
       ],
       "parsimonious": [
         "URB*STB"
+      ],
+      "term_fits": [
+        {
+          "family": "conservative",
+          "term": "DEV*URB*LIT*IND*STB",
+          "consistency": 0.9042056074766355,
+          "pri": 0.8857938718662952,
+          "raw_coverage": 0.454225352112676,
+          "unique_coverage": null,
+          "cases": ["BE", "CZ", "NL", "UK"]
+        },
+        {
+          "family": "parsimonious",
+          "term": "URB*STB",
+          "consistency": 0.8737672583826429,
+          "pri": 0.8454106280193235,
+          "raw_coverage": 0.5199530516431925,
+          "unique_coverage": null,
+          "cases": ["BE", "CZ", "NL", "UK"]
+        }
       ]
     },
     {
@@ -935,6 +993,35 @@
       ],
       "parsimonious": [
         "DEV*STB"
+      ],
+      "term_fits": [
+        {
+          "family": "conservative",
+          "term": "DEV*~URB*LIT*STB",
+          "consistency": 1,
+          "pri": 1,
+          "raw_coverage": 0.5,
+          "unique_coverage": 0.25,
+          "cases": ["FI", "IE", "FR", "SE"]
+        },
+        {
+          "family": "conservative",
+          "term": "DEV*LIT*IND*STB",
+          "consistency": 1,
+          "pri": 1,
+          "raw_coverage": 0.75,
+          "unique_coverage": 0.5,
+          "cases": ["FR", "SE", "BE", "CZ", "NL", "UK"]
+        },
+        {
+          "family": "parsimonious",
+          "term": "DEV*STB",
+          "consistency": 1,
+          "pri": 1,
+          "raw_coverage": 1,
+          "unique_coverage": null,
+          "cases": ["FI", "IE", "FR", "SE", "BE", "CZ", "NL", "UK"]
+        }
       ]
     },
     {
@@ -1022,6 +1109,26 @@
       ],
       "parsimonious": [
         "DEV*STB"
+      ],
+      "term_fits": [
+        {
+          "family": "conservative",
+          "term": "DEV*LIT*STB",
+          "consistency": 0.868811881188119,
+          "pri": 0.8481375358166192,
+          "raw_coverage": 0.8239436619718311,
+          "unique_coverage": null,
+          "cases": ["BE", "CZ", "FI", "FR", "IE", "NL", "SE", "UK"]
+        },
+        {
+          "family": "parsimonious",
+          "term": "DEV*STB",
+          "consistency": 0.868811881188119,
+          "pri": 0.8481375358166192,
+          "raw_coverage": 0.8239436619718311,
+          "unique_coverage": null,
+          "cases": ["BE", "CZ", "FI", "FR", "IE", "NL", "SE", "UK"]
+        }
       ]
     }
   ],

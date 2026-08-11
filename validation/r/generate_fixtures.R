@@ -51,6 +51,46 @@ solution_records <- function(model) {
   lapply(model$solution, function(solution) as.character(solution))
 }
 
+# Per-term fit for both solution families, including unique coverage, which R
+# reports as covU and which is the one fit measure setqca did not previously
+# compute at all.
+term_fit_records <- function(tt) {
+  records <- list()
+  for (label in c("conservative", "parsimonious")) {
+    include <- if (label == "conservative") "" else "?"
+    model <- tryCatch(minimize(tt, include = include, details = TRUE), error = function(e) NULL)
+    if (is.null(model) || is.null(model$IC$incl.cov)) {
+      next
+    }
+    frame <- model$IC$incl.cov
+    terms <- rownames(frame)
+    for (index in seq_along(terms)) {
+      if (identical(terms[index], "expression")) {
+        next
+      }
+      # R separates cases from different truth-table rows with ";" and cases
+      # within a row with ",". Both are just case labels here.
+      labels <- trimws(unlist(strsplit(as.character(frame[index, "cases"]), "[,;]")))
+      labels <- labels[nzchar(labels)]
+
+      # covU is NA for a single-term solution: there is no other term for the
+      # coverage to be unique against.
+      covu <- as.numeric(frame[index, "covU"])
+
+      records[[length(records) + 1]] <- list(
+        family = label,
+        term = terms[index],
+        consistency = as.numeric(frame[index, "inclS"]),
+        pri = as.numeric(frame[index, "PRI"]),
+        raw_coverage = as.numeric(frame[index, "covS"]),
+        unique_coverage = if (is.na(covu)) NULL else covu,
+        cases = labels
+      )
+    }
+  }
+  records
+}
+
 safe_minimize <- function(tt, include) {
   result <- tryCatch(
     minimize(tt, include = include, details = TRUE),
@@ -124,7 +164,8 @@ build_analysis <- function(id, dataset_name, outcome, conditions, incl_cut, n_cu
     case_ids = rownames(frame),
     truth_table = truth_table_records(tt, conditions),
     conservative = safe_minimize(tt, include = ""),
-    parsimonious = safe_minimize(tt, include = "?")
+    parsimonious = safe_minimize(tt, include = "?"),
+    term_fits = term_fit_records(tt)
   )
 }
 
