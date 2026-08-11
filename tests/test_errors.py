@@ -150,7 +150,7 @@ class TestEstimatorGuards:
         self, fuzzy_data: pd.DataFrame
     ) -> None:
         model = FSQCA(directional_expectations={"A": "up"})  # type: ignore[dict-item]
-        with pytest.raises(ValueError, match="must be"):
+        with pytest.raises(ValueError, match="invalid"):
             model.fit(fuzzy_data, outcome="Y", conditions=["A", "B"])
 
     def test_directional_expectations_must_reference_known_conditions(
