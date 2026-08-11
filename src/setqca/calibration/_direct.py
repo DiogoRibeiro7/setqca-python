@@ -8,7 +8,7 @@ from math import log
 import numpy as np
 import numpy.typing as npt
 
-from ._validation import FloatArray, as_float_array
+from setqca._validation import FloatArray, as_float_array
 
 
 def _logistic_cdf(z: FloatArray) -> FloatArray:
