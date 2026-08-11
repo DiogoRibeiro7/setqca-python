@@ -6,7 +6,8 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from .implicant import Implicant, minterm_to_implicant
+from .complexity import estimate_complexity, warn_if_complex
+from .implicant import Implicant
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,53 +27,98 @@ class BooleanSolution:
 
 
 def prime_implicants(on_set: set[int], dont_cares: set[int], width: int) -> tuple[Implicant, ...]:
-    """Generate all prime implicants exactly using classical QMC."""
+    """Generate all prime implicants exactly using classical QMC.
+
+    Internally a cube is a pair of integers — a mask of the fixed positions and
+    the values at those positions — rather than a tuple of optional bits.
+    Benchmarking showed this phase dominating on remainder-heavy problems,
+    which is exactly the parsimonious case, and integer masks make combining
+    a few machine operations instead of a tuple walk. The algorithm is
+    unchanged; only the representation is.
+
+    Parameters
+    ----------
+    on_set : set of int
+        Minterms that must be covered.
+    dont_cares : set of int
+        Minterms usable but not required.
+    width : int
+        Number of conditions.
+
+    Returns
+    -------
+    tuple of Implicant
+        Primes covering at least one required minterm, ordered by literal
+        count then bit pattern.
+
+    Raises
+    ------
+    ValueError
+        If the two sets overlap.
+    """
     if on_set & dont_cares:
         raise ValueError("on_set and dont_cares must be disjoint.")
     universe = on_set | dont_cares
     if not universe:
         return ()
 
-    current = {minterm_to_implicant(value, width) for value in universe}
-    primes: set[Implicant] = set()
+    full_mask = (1 << width) - 1
+    # A cube is (mask, value): `mask` marks the fixed positions, `value` holds
+    # the bits there. A minterm m is covered when `m & mask == value`.
+    current: set[tuple[int, int]] = {(full_mask, minterm) for minterm in universe}
+    primes: set[tuple[int, int]] = set()
 
     while current:
-        grouped: dict[int, list[Implicant]] = defaultdict(list)
-        for implicant in current:
-            grouped[sum(bit == 1 for bit in implicant.pattern)].append(implicant)
+        grouped: dict[tuple[int, int], list[int]] = defaultdict(list)
+        for mask, value in current:
+            grouped[(mask, value.bit_count())].append(value)
 
-        used: set[Implicant] = set()
-        next_round: dict[tuple[int | None, ...], Implicant] = {}
-        for ones in sorted(grouped):
-            for left in grouped[ones]:
-                for right in grouped.get(ones + 1, []):
-                    combined = left.combine(right)
-                    if combined is None:
+        used: set[tuple[int, int]] = set()
+        next_round: set[tuple[int, int]] = set()
+        for (mask, ones), values in grouped.items():
+            neighbours = grouped.get((mask, ones + 1))
+            if not neighbours:
+                continue
+            for left in values:
+                for right in neighbours:
+                    difference = left ^ right
+                    # Exactly one differing fixed position, and both cubes fix
+                    # it, is the classical combination rule.
+                    if difference & (difference - 1) or not difference & mask:
                         continue
-                    used.add(left)
-                    used.add(right)
-                    previous = next_round.get(combined.pattern)
-                    if previous is None:
-                        next_round[combined.pattern] = combined
-                    else:
-                        next_round[combined.pattern] = Implicant(
-                            combined.pattern, previous.origins | combined.origins
-                        )
+                    used.add((mask, left))
+                    used.add((mask, right))
+                    reduced = mask & ~difference
+                    next_round.add((reduced, left & reduced))
 
-        primes.update(item for item in current if item not in used)
-        current = set(next_round.values())
+        primes.update(cube for cube in current if cube not in used)
+        current = next_round
+
+    def covers(cube: tuple[int, int], minterm: int) -> bool:
+        mask, value = cube
+        return minterm & mask == value
 
     # A prime built only from don't-cares cannot cover any required minterm.
-    useful = [item for item in primes if any(item.covers(m) for m in on_set)]
+    useful = [cube for cube in primes if any(covers(cube, m) for m in on_set)]
     return tuple(
         sorted(
-            useful,
+            (_to_implicant(cube, width, on_set | dont_cares) for cube in useful),
             key=lambda item: (
                 item.literals,
                 tuple(2 if bit is None else bit for bit in item.pattern),
             ),
         )
     )
+
+
+def _to_implicant(cube: tuple[int, int], width: int, universe: set[int]) -> Implicant:
+    """Convert an internal (mask, value) cube to the public implicant type."""
+    mask, value = cube
+    pattern = tuple(
+        None if not mask >> shift & 1 else value >> shift & 1 for shift in reversed(range(width))
+    )
+    origins = frozenset(minterm for minterm in universe if minterm & mask == value)
+    return Implicant(pattern, origins)
 
 
 def exact_minimum_covers(
@@ -230,8 +276,40 @@ def minimize(
     dont_cares: set[int] | None = None,
     width: int,
     max_solutions: int = 256,
+    complexity_guard: bool = True,
 ) -> tuple[BooleanSolution, ...]:
-    """Return all exact minimum Boolean covers for the specified truth table."""
+    """Return all exact minimum Boolean covers for the specified truth table.
+
+    Parameters
+    ----------
+    on_set : set of int
+        Minterms that must be covered.
+    dont_cares : set of int, optional
+        Logical remainders, usable but not required.
+    width : int
+        Number of conditions.
+    max_solutions : int, default 256
+        Upper bound on the number of tied minimum covers returned.
+    complexity_guard : bool, default True
+        Warn with :class:`~setqca.minimize.MinimizationComplexityWarning` when
+        the chart looks likely to be slow. The result is exact either way; the
+        warning arrives before the expensive phase rather than after it.
+
+    Returns
+    -------
+    tuple of BooleanSolution
+        Every cover of provably minimal cost.
+    """
     dc = set() if dont_cares is None else set(dont_cares)
-    primes = prime_implicants(set(on_set), dc, width)
-    return exact_minimum_covers(primes, set(on_set), max_solutions=max_solutions)
+    required = set(on_set)
+    primes = prime_implicants(required, dc, width)
+    if complexity_guard:
+        warn_if_complex(
+            estimate_complexity(
+                width=width,
+                required=len(required),
+                dont_cares=len(dc),
+                primes=len(primes),
+            )
+        )
+    return exact_minimum_covers(primes, required, max_solutions=max_solutions)

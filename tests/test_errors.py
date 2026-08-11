@@ -67,6 +67,19 @@ class TestBooleanEngineGuards:
     def test_implicants_differing_in_more_than_one_literal_do_not_combine(self) -> None:
         assert minterm_to_implicant(0, 3).combine(minterm_to_implicant(3, 3)) is None
 
+    def test_adjacent_implicants_combine_into_a_wider_cube(self) -> None:
+        """`Implicant.combine` is public API, so it is tested on its own merits.
+
+        Prime generation now works on integer masks internally and no longer
+        calls this, but the method remains part of the type's interface.
+        """
+        combined = minterm_to_implicant(6, 3).combine(minterm_to_implicant(7, 3))
+        assert combined is not None
+        assert combined.pattern == (1, 1, None)
+        assert combined.origins == frozenset({6, 7})
+        assert combined.literals == 2
+        assert combined.as_expression(("A", "B", "C")) == "A*B"
+
     def test_a_dont_care_literal_blocks_combination(self) -> None:
         left = Implicant((1, None, 0), frozenset({4}))
         right = Implicant((1, 1, 1), frozenset({7}))
