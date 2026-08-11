@@ -29,6 +29,7 @@ from setqca import (
     build_truth_table,
     calibrate_direct,
     necessity,
+    necessity_analysis,
     sufficiency,
 )
 
@@ -282,6 +283,62 @@ def test_parsimonious_solution_matches_r(analysis: dict[str, Any]) -> None:
         for solution in result.parsimonious
     }
     assert obtained == _canonical_solutions(analysis["parsimonious"])
+
+
+# ---------------------------------------------------------------------------
+# Systematic necessity screening
+# ---------------------------------------------------------------------------
+
+_SCREENS = FIXTURE.get("necessity_screens", [])
+
+
+@pytest.mark.parametrize("screen", _SCREENS, ids=_ids(_SCREENS))
+def test_necessity_screening_matches_r(screen: dict[str, Any]) -> None:
+    """Every candidate, presence and absence alike, must agree with R."""
+    frame = _frame(screen)
+    analysis = necessity_analysis(
+        frame,
+        outcome=screen["outcome"],
+        conditions=list(screen["conditions"]),
+        max_disjunction_size=2,
+    )
+    obtained = {item.expression: item.fit for item in analysis.candidates}
+
+    for expected in screen["candidates"]:
+        expression = expected["expression"]
+        if expression not in obtained:
+            # R's extra unions are checked through the expression evaluator.
+            membership = _parse_expression(expression).evaluate(frame)
+            fit = necessity(membership, frame[screen["outcome"]].to_numpy())
+        else:
+            fit = obtained[expression]
+
+        assert fit.consistency == pytest.approx(expected["consistency"], abs=TOLERANCE), (
+            f"consistency differs for {expression}"
+        )
+        assert fit.coverage == pytest.approx(expected["coverage"], abs=TOLERANCE), (
+            f"coverage differs for {expression}"
+        )
+        assert fit.ron == pytest.approx(expected["ron"], abs=TOLERANCE), (
+            f"RoN differs for {expression}"
+        )
+
+
+@pytest.mark.parametrize("screen", _SCREENS, ids=_ids(_SCREENS))
+def test_trivial_necessity_is_flagged_where_relevance_is_low(screen: dict[str, Any]) -> None:
+    """LIT+STB reaches consistency 0.995 in R but RoN 0.38 — necessary-looking, trivial."""
+    frame = _frame(screen)
+    analysis = necessity_analysis(
+        frame,
+        outcome=screen["outcome"],
+        conditions=list(screen["conditions"]),
+        max_disjunction_size=2,
+    )
+    union = next(item for item in analysis.candidates if item.expression == "LIT+STB")
+    assert union.fit.consistency > 0.99
+    assert union.fit.ron < 0.5
+    assert union.trivial is True
+    assert union.necessary is False
 
 
 # ---------------------------------------------------------------------------

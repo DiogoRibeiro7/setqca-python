@@ -212,6 +212,52 @@ pof_cases <- Filter(Negate(is.null), list(
 ))
 
 # ---------------------------------------------------------------------------
+# Systematic necessity screening
+# ---------------------------------------------------------------------------
+
+# Every condition and its negation, screened one at a time, plus a couple of
+# unions to exercise the SUIN case.
+build_necessity_screen <- function(id, dataset_name, outcome, conditions, extra) {
+  data(list = dataset_name, package = "QCA", envir = environment())
+  frame <- get(dataset_name, envir = environment())
+  frame <- frame[, c(conditions, outcome), drop = FALSE]
+
+  expressions <- c(conditions, paste0("~", conditions), extra)
+  records <- lapply(expressions, function(expression) {
+    value <- pof(expression, outcome, frame, relation = "necessity")
+    row <- if ("expression" %in% rownames(value$incl.cov)) {
+      value$incl.cov["expression", ]
+    } else {
+      value$incl.cov[1, ]
+    }
+    list(
+      expression = expression,
+      consistency = as.numeric(row[["inclN"]]),
+      coverage = as.numeric(row[["covN"]]),
+      ron = as.numeric(row[["RoN"]])
+    )
+  })
+
+  list(
+    id = id,
+    dataset = dataset_name,
+    outcome = outcome,
+    conditions = conditions,
+    data = as.list(frame),
+    case_ids = rownames(frame),
+    candidates = records
+  )
+}
+
+necessity_screens <- list(
+  build_necessity_screen(
+    "LF-SURV-screen", "LF", "SURV",
+    c("DEV", "URB", "LIT", "IND", "STB"),
+    c("DEV+URB", "LIT+STB", "~DEV+~URB")
+  )
+)
+
+# ---------------------------------------------------------------------------
 # Direct calibration
 # ---------------------------------------------------------------------------
 
@@ -286,7 +332,8 @@ fixture <- list(
   calibration = calibration_cases,
   pof = pof_cases,
   analyses = analyses,
-  intermediate = intermediate_cases
+  intermediate = intermediate_cases,
+  necessity_screens = necessity_screens
 )
 
 dir.create(dirname(out_path), recursive = TRUE, showWarnings = FALSE)
@@ -296,3 +343,4 @@ cat("  calibration cases:", length(calibration_cases), "\n")
 cat("  pof cases:        ", length(pof_cases), "\n")
 cat("  analyses:         ", length(analyses), "\n")
 cat("  intermediate:     ", length(intermediate_cases), "\n")
+cat("  necessity screens:", length(necessity_screens), "\n")

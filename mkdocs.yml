@@ -43,6 +43,7 @@ nav:
   - User guide:
       - Calibration: guide/calibration.md
       - Expressions: guide/expressions.md
+      - Necessity: guide/necessity.md
       - Truth tables: guide/truth-tables.md
       - Minimisation: guide/minimisation.md
   - Methodology: METHODOLOGY.md

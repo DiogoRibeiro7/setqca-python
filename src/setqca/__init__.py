@@ -9,6 +9,7 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
+from .analysis import NecessityAnalysis, NecessityCandidate, necessity_analysis
 from .calibration import DirectCalibration, calibrate_crisp, calibrate_direct
 from .counterfactuals import (
     CounterfactualAnalysis,
@@ -62,6 +63,8 @@ __all__ = [
     "Intersection",
     "MinimalCover",
     "MinimizationResult",
+    "NecessityAnalysis",
+    "NecessityCandidate",
     "NecessityFit",
     "Negation",
     "PrimeImplicant",
@@ -83,6 +86,7 @@ __all__ = [
     "minimize",
     "minimize_chart",
     "necessity",
+    "necessity_analysis",
     "parse_expression",
     "simplify_expression",
     "sufficiency",

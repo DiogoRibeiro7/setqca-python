@@ -34,6 +34,8 @@ run over all cases.
 | Necessity coverage | `Σ min(X,Y) / Σ X` | `metrics.necessity` | `TestNecessity` | `1e-9` vs R | ✅ Verified |
 | Relevance of necessity | `Σ (1−X) / Σ (1 − min(X,Y))` | `metrics.necessity` | `TestNecessity` | `1e-9` vs R | ✅ Verified |
 | Unique coverage | `cov(Tᵢ) − cov(⋃ⱼ≠ᵢ Tⱼ)` | — | — | — | ❌ Not implemented |
+| Trivial necessity | `RoN` below threshold with high consistency | `analysis.necessity` | `test_necessity`, parity | `1e-9` vs R | ✅ Verified |
+| SUIN disjunction | `consistency(A+B) ≥ max over parts` | `analysis.necessity` | `test_necessity` | `1e-12` | ✅ Tested |
 | Direct calibration, logistic | see below | `calibration.DirectCalibration` | `TestCalibration`, parity | `1e-9` vs R | ✅ Verified |
 | Direct calibration, piecewise | see below | `calibration.DirectCalibration` | `TestCalibration`, parity | `1e-9` vs R | ✅ Verified |
 | Truth-table corner assignment | `xᵢ ≥ 0.5` | `truth_table.build_truth_table` | `TestTruthTableAndMinimisation`, parity | exact | ✅ Verified |
