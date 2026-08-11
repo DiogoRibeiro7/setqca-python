@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from itertools import product
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import pandas as pd
 
 from ._validation import FloatArray, validate_columns, validate_membership
 from .metrics import sufficiency
+
+if TYPE_CHECKING:  # pragma: no cover - imported for type checking only
+    from .minimize.qmc import BooleanSolution
 
 TruthCode = Literal["1", "0", "C", "R"]
 """Outcome code of a truth-table row.
@@ -22,7 +26,16 @@ TruthCode = Literal["1", "0", "C", "R"]
 
 @dataclass(frozen=True, slots=True)
 class TruthTableRow:
-    """A single causal configuration and its empirical fit."""
+    """A single causal configuration and its empirical fit.
+
+    Attributes
+    ----------
+    exclusion_reason
+        Why the row is not coded sufficient, in words. ``None`` for rows coded
+        ``"1"``. Recorded because the outcome code alone conflates distinct
+        situations: a row can miss out for lack of cases, for low consistency,
+        or for low PRI, and those call for different responses.
+    """
 
     minterm: int
     configuration: tuple[int, ...]
@@ -31,11 +44,25 @@ class TruthTableRow:
     pri: float
     outcome: TruthCode
     cases: tuple[str, ...]
+    exclusion_reason: str | None = None
 
     @property
     def observed(self) -> bool:
         """Return whether the configuration passed the frequency cutoff."""
         return self.outcome != "R"
+
+    @property
+    def excluded_by_threshold(self) -> bool:
+        """Return whether a threshold, rather than the evidence, kept this row out.
+
+        True for rows held back by the frequency or PRI cutoffs. A row with
+        genuinely low consistency is excluded by the data, not by a choice.
+        """
+        return (
+            self.outcome != "1"
+            and self.exclusion_reason is not None
+            and ("frequency" in self.exclusion_reason or "PRI" in self.exclusion_reason)
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,6 +97,49 @@ class TruthTable:
         """Return minterms of logical remainders, i.e. rows below the frequency cutoff."""
         return {row.minterm for row in self.rows if row.outcome == "R"}
 
+    def rows_with(self, code: TruthCode) -> tuple[TruthTableRow, ...]:
+        """Return the rows carrying one outcome code, in minterm order."""
+        return tuple(row for row in self.rows if row.outcome == code)
+
+    def positive_rows(self) -> tuple[TruthTableRow, ...]:
+        """Return rows coded sufficient for the outcome."""
+        return self.rows_with("1")
+
+    def negative_rows(self) -> tuple[TruthTableRow, ...]:
+        """Return rows coded not sufficient."""
+        return self.rows_with("0")
+
+    def contradictions(self) -> tuple[TruthTableRow, ...]:
+        """Return rows falling between the exclusion and inclusion cutoffs."""
+        return self.rows_with("C")
+
+    def remainders(self) -> tuple[TruthTableRow, ...]:
+        """Return logical remainders: rows below the frequency cutoff."""
+        return self.rows_with("R")
+
+    def excluded_rows(self) -> tuple[TruthTableRow, ...]:
+        """Return rows a *threshold* kept out, rather than the evidence.
+
+        These are the rows whose exclusion is a consequence of an analytical
+        choice — the frequency or PRI cutoff — and therefore the rows to
+        revisit when judging how much the result depends on those choices. A
+        row with genuinely low consistency is excluded by the data and is not
+        listed here.
+        """
+        return tuple(row for row in self.rows if row.excluded_by_threshold)
+
+    def summary(self) -> str:
+        """Return a short account of how the table came out."""
+        return (
+            f"{len(self.rows)} configurations of {len(self.conditions)} conditions "
+            f"({self.outcome_name})\n"
+            f"  sufficient:    {len(self.positive_rows())}\n"
+            f"  not sufficient:{len(self.negative_rows())}\n"
+            f"  contradictory: {len(self.contradictions())}\n"
+            f"  remainders:    {len(self.remainders())}\n"
+            f"  excluded by a threshold: {len(self.excluded_rows())}"
+        )
+
     def to_frame(self) -> pd.DataFrame:
         """Return a tidy pandas representation of the truth table.
 
@@ -77,7 +147,8 @@ class TruthTable:
         -------
         pandas.DataFrame
             One row per configuration, with the condition states followed by
-            ``minterm``, ``n``, ``consistency``, ``PRI``, ``OUT`` and ``cases``.
+            ``minterm``, ``n``, ``consistency``, ``PRI``, ``OUT``, ``cases``
+            and ``excluded_because``.
         """
         records: list[dict[str, object]] = []
         for row in self.rows:
@@ -90,10 +161,116 @@ class TruthTable:
                     "PRI": row.pri,
                     "OUT": row.outcome,
                     "cases": ", ".join(row.cases),
+                    "excluded_because": row.exclusion_reason or "",
                 }
             )
             records.append(record)
         return pd.DataFrame.from_records(records)
+
+    def minimize(
+        self, *, include_remainders: bool = False, max_solutions: int = 256
+    ) -> tuple[BooleanSolution, ...]:
+        """Minimise directly from the table, without the original data.
+
+        A stored truth table carries everything Boolean minimisation needs, so
+        a saved table can be re-minimised under different assumptions without
+        recalibrating or rebuilding it.
+
+        Parameters
+        ----------
+        include_remainders : bool, default False
+            Treat logical remainders as don't-cares, giving the parsimonious
+            solution rather than the conservative one.
+        max_solutions : int, default 256
+            Upper bound on tied minimal covers.
+
+        Returns
+        -------
+        tuple of BooleanSolution
+            Boolean covers only. Case-level parameters of fit need the original
+            data and are produced by :meth:`~setqca.FSQCA.fit`.
+
+        Raises
+        ------
+        ValueError
+            If no row is coded sufficient.
+        """
+        from .minimize.qmc import minimize as _minimize
+
+        on_set = self.positive_minterms
+        if not on_set:
+            raise ValueError("No truth-table row is sufficient under the chosen thresholds.")
+        return _minimize(
+            on_set,
+            dont_cares=self.remainder_minterms if include_remainders else None,
+            width=len(self.conditions),
+            max_solutions=max_solutions,
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-compatible dictionary describing the whole table."""
+        return {
+            "conditions": list(self.conditions),
+            "outcome": self.outcome_name,
+            "inclusion_cutoff": self.inclusion_cutoff,
+            "exclusion_cutoff": self.exclusion_cutoff,
+            "pri_cutoff": self.pri_cutoff,
+            "frequency_cutoff": self.frequency_cutoff,
+            "rows": [
+                {
+                    "minterm": row.minterm,
+                    "configuration": list(row.configuration),
+                    "n": row.frequency,
+                    "consistency": row.consistency,
+                    "pri": row.pri,
+                    "out": row.outcome,
+                    "cases": list(row.cases),
+                    "excluded_because": row.exclusion_reason,
+                }
+                for row in self.rows
+            ],
+        }
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> TruthTable:
+        """Rebuild a table from :meth:`to_dict` output.
+
+        Raises
+        ------
+        KeyError
+            If a required key is missing.
+        """
+        rows = tuple(
+            TruthTableRow(
+                minterm=int(record["minterm"]),
+                configuration=tuple(int(value) for value in record["configuration"]),
+                frequency=int(record["n"]),
+                consistency=float(record["consistency"]),
+                pri=float(record["pri"]),
+                outcome=record["out"],
+                cases=tuple(str(case) for case in record["cases"]),
+                exclusion_reason=record.get("excluded_because"),
+            )
+            for record in payload["rows"]
+        )
+        return cls(
+            conditions=tuple(payload["conditions"]),
+            outcome_name=payload["outcome"],
+            rows=rows,
+            inclusion_cutoff=float(payload["inclusion_cutoff"]),
+            exclusion_cutoff=float(payload["exclusion_cutoff"]),
+            pri_cutoff=float(payload["pri_cutoff"]),
+            frequency_cutoff=int(payload["frequency_cutoff"]),
+        )
+
+    def to_json(self, *, indent: int | None = None) -> str:
+        """Serialise the table to JSON."""
+        return json.dumps(self.to_dict(), indent=indent)
+
+    @classmethod
+    def from_json(cls, text: str) -> TruthTable:
+        """Rebuild a table from JSON."""
+        return cls.from_dict(json.loads(text))
 
 
 def _configuration_membership(memberships: FloatArray, config: tuple[int, ...]) -> FloatArray:
@@ -219,14 +396,26 @@ def build_truth_table(
         n = int(selector.sum())
         membership = _configuration_membership(x, config)
         fit = sufficiency(membership, y)
+        reason: str | None = None
         if n < frequency_cutoff:
             code: TruthCode = "R"
+            reason = f"frequency {n} below the cutoff of {frequency_cutoff}"
         elif fit.consistency >= inclusion_cutoff and fit.pri >= pri_cutoff:
             code = "1"
-        elif fit.consistency >= exclusion:
-            code = "C"
         else:
-            code = "0"
+            # Consistency and PRI fail for different reasons and warrant
+            # different responses, so both are named rather than collapsed
+            # into the outcome code.
+            failures = []
+            if fit.consistency < inclusion_cutoff:
+                failures.append(
+                    f"consistency {fit.consistency:.3f} below the inclusion "
+                    f"cutoff of {inclusion_cutoff}"
+                )
+            if fit.pri < pri_cutoff:
+                failures.append(f"PRI {fit.pri:.3f} below the cutoff of {pri_cutoff}")
+            reason = "; ".join(failures)
+            code = "C" if fit.consistency >= exclusion else "0"
         rows.append(
             TruthTableRow(
                 minterm=_minterm(config),
@@ -236,6 +425,7 @@ def build_truth_table(
                 pri=fit.pri,
                 outcome=code,
                 cases=tuple(str(v) for v in case_names[selector]),
+                exclusion_reason=reason,
             )
         )
 
