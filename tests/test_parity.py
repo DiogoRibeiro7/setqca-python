@@ -33,6 +33,7 @@ from setqca import (
     sufficiency,
     sufficiency_diagnostics,
 )
+from setqca.multivalue import MVQCA, MultiValueDomain, build_multivalue_truth_table
 
 pytestmark = pytest.mark.parity
 
@@ -293,6 +294,87 @@ def test_parsimonious_solution_matches_r(analysis: dict[str, Any]) -> None:
         for solution in result.parsimonious
     }
     assert obtained == _canonical_solutions(analysis["parsimonious"])
+
+
+# ---------------------------------------------------------------------------
+# Multi-value QCA
+# ---------------------------------------------------------------------------
+
+_MULTIVALUE = FIXTURE.get("multivalue", [])
+
+
+def _r_term_coverage(term: str, domain: MultiValueDomain) -> set[int]:
+    """Return the configurations an R multi-value term such as ``A[1]*B[2]`` covers."""
+    fixed: dict[str, int] = {}
+    for literal in term.split("*"):
+        name, _, rest = literal.partition("[")
+        fixed[name.strip()] = int(rest.rstrip("]"))
+    return {
+        domain.index_of(configuration)
+        for configuration in domain.configurations()
+        if all(
+            configuration[domain.conditions.index(name)] == value for name, value in fixed.items()
+        )
+    }
+
+
+@pytest.mark.parametrize("case", _MULTIVALUE, ids=_ids(_MULTIVALUE))
+def test_multivalue_truth_table_matches_r(case: dict[str, Any]) -> None:
+    frame = pd.DataFrame(case["data"])
+    table = build_multivalue_truth_table(
+        frame,
+        outcome=case["outcome"],
+        conditions=list(case["conditions"]),
+        inclusion_cutoff=float(case["incl_cut"]),
+    )
+    obtained = {row.configuration: row for row in table.rows}
+
+    assert len(obtained) == len(case["truth_table"])
+    for expected in case["truth_table"]:
+        row = obtained[tuple(expected["configuration"])]
+        assert row.frequency == expected["n"]
+        assert row.outcome == expected["out"]
+        if expected["consistency"] is not None:
+            assert row.consistency == pytest.approx(expected["consistency"], abs=TOLERANCE)
+
+
+@pytest.mark.parametrize("case", _MULTIVALUE, ids=_ids(_MULTIVALUE))
+@pytest.mark.parametrize("family", ["conservative", "parsimonious"])
+def test_multivalue_solutions_match_r_in_cost_and_coverage(
+    case: dict[str, Any], family: str
+) -> None:
+    """Compared by cost and coverage, not by text.
+
+    R writes single-value literals only (``regime[1]``); setqca also forms
+    subset literals (``regime{1,2}``) when they are prime. On the regime/wealth
+    benchmark R's conservative term ``regime[1]*wealth[1]`` is a proper subset
+    of setqca's ``regime{1,2}*wealth{1}``, so R's is not a prime implicant. Both
+    covers are minimal and cover the same configurations, which is what the
+    comparison asserts.
+    """
+    expected_solutions = case[family]
+    if not expected_solutions:
+        pytest.skip("R produced no solution for this family")
+
+    frame = pd.DataFrame(case["data"])
+    result = MVQCA(consistency=float(case["incl_cut"])).fit(
+        frame, outcome=case["outcome"], conditions=list(case["conditions"])
+    )
+    domain = result.domain
+    obtained: tuple[Any, ...] = getattr(result, family)
+
+    r_terms = _as_list(expected_solutions[0])
+    r_coverage: set[int] = set()
+    for term in r_terms:
+        r_coverage |= _r_term_coverage(term, domain)
+    r_literals = sum(len(term.split("*")) for term in r_terms)
+
+    ours = obtained[0]
+    our_coverage = {i for i in range(domain.size) if ours.covers(i, domain)}
+
+    assert our_coverage == r_coverage, "the two solutions must select the same configurations"
+    assert len(ours.cubes) == len(r_terms), "the number of terms must agree"
+    assert ours.literal_count(domain) == r_literals, "the literal count must agree"
 
 
 # ---------------------------------------------------------------------------
