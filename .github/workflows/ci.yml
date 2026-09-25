@@ -25,13 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           # numpy ships PEP 695 stubs, so mypy needs 3.12+ semantics.
           python-version: "3.12"
-
-      - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
+          install-deps: "false"
 
       - name: Install dependencies
         run: poetry install --with dev --no-interaction
@@ -59,12 +57,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
+          install-deps: "false"
 
       - name: Install dependencies
         run: poetry install --with dev --no-interaction
@@ -85,12 +81,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           python-version: "3.12"
-
-      - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
+          install-deps: "false"
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -107,12 +101,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           python-version: "3.12"
-
-      - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
+          install-deps: "false"
 
       - name: Build sdist and wheel
         run: poetry build
@@ -152,12 +144,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           python-version: "3.12"
-
-      - name: Install Poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
+          install-deps: "false"
 
       - name: Install dependencies
         run: poetry install --with docs --no-interaction
