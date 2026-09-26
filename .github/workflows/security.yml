@@ -19,12 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
+      - uses: DiogoRibeiro7/git-actions-collection/.github/actions/setup-poetry@v1
         with:
           python-version: "3.12"
-
-      - name: Install Poetry
-        run: pipx install poetry==2.2.1
+          poetry-version: "2.2.1"
+          install-deps: "false"
 
       - name: Export the resolved runtime dependency set
         run: |
