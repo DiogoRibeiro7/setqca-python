@@ -1,0 +1,7 @@
+Tool: built-in image generation
+
+Use case: logo-brand.
+Asset type: square project logo for setqca-python.
+Project purpose: Native Python toolkit for crisp-set and fuzzy-set Qualitative Comparative Analysis
+Design direction: An abstract stained-glass set-theory emblem: three overlapping broad circular panes in emerald, ruby, and amethyst, their shared intersections rendered as luminous distinct colors. Strong thin charcoal lead seams, rounded triangular overall silhouette, clean white background. Flat frontal view, restrained translucent glass texture, no metallic rings or typography.
+Composition: one finished square image, visually distinctive and readable at 160 pixels, with enough margin for README display. Produce the actual artwork, not a mockup sheet or brand presentation. No watermark. Do not use a navy-and-gold metallic badge aesthetic.
