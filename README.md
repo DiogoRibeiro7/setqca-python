@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/project-avatar.png" alt="setqca-python project logo" width="160" height="160">
+</p>
+
 # setqca
 
 [![CI](https://github.com/DiogoRibeiro7/setqca-python/actions/workflows/ci.yml/badge.svg)](https://github.com/DiogoRibeiro7/setqca-python/actions/workflows/ci.yml)
