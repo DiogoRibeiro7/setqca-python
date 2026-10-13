@@ -74,7 +74,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 mkdocs = ">=1.6"
 mkdocs-material = ">=9.5"
-mkdocstrings = { version = ">=0.26", extras = ["python"] }
+mkdocstrings = { version = ">=1.0.7", extras = ["python"] }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
